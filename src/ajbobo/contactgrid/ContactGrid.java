@@ -11,7 +11,6 @@ import android.widget.GridView;
 import android.widget.Toast;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.Window;
 
 public class ContactGrid extends Activity
 {
@@ -121,12 +120,12 @@ public class ContactGrid extends Activity
 		if (_currentmode == MODE_SELECT)
 		{
 			if (_savedIDs[index] != -1)
-				Toast.makeText(ContactGrid.this, "Selected: " + index, Toast.LENGTH_SHORT).show();
+				Toast.makeText(ContactGrid.this, "Selected: " + index, Toast.LENGTH_SHORT).show(); // TODO: Should open the Contact's Details
 		}
 		else if (_currentmode == MODE_ADD)
 		{
 			if (_savedIDs[index] == -1)
-				_savedIDs[index] = index;
+				_savedIDs[index] = index; // TODO: Should open a Contact list so that the user can select a Contant to add to the Grid
 			else
 				Toast.makeText(ContactGrid.this, "That space is already taken", Toast.LENGTH_SHORT).show();
 		}

@@ -23,18 +23,18 @@ public class ContactAdapter extends BaseAdapter
 
 	public Object getItem(int arg0)
 	{
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	public long getItemId(int arg0)
 	{
-		// TODO Auto-generated method stub
 		return 0;
 	}
 
 	public View getView(int position, View convertView, ViewGroup parent)
 	{
+		// TODO: Somehow this also needs to show the Contacts' names
+		//       Do I need to create my own View object that has an ImageView and a TextView together?
 		ImageView imageView;
 		if (convertView == null) // if it's not recycled, initialize some attributes
 		{ 
@@ -52,7 +52,7 @@ public class ContactAdapter extends BaseAdapter
 		if (id == -1) // Nothing assigned
 			imageView.setImageResource(R.drawable.question);
 		else
-			imageView.setImageResource(R.drawable.android);
+			imageView.setImageResource(R.drawable.android); // TODO: This needs to be the Contact's picture, if it exists
 		return imageView;
 	}
 
