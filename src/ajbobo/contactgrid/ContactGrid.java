@@ -2,8 +2,12 @@ package ajbobo.contactgrid;
 
 import ajbobo.contactgrid.ContactGrid;
 import android.app.Activity;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.Contacts.People;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
@@ -25,6 +29,8 @@ public class ContactGrid extends Activity
 	private static final int MENU_SELECT = Menu.FIRST;
 	private static final int MENU_ADD = Menu.FIRST + 1;
 	private static final int MENU_REMOVE = Menu.FIRST + 2;
+	
+	private static final int PICK_CONTACT = 1;
 	
 	// Class variables
 	private int _currentmode = 0;
@@ -79,6 +85,7 @@ public class ContactGrid extends Activity
 	}
 	
 	/** Create menu items */
+	@Override
 	public boolean onCreateOptionsMenu(Menu menu)
 	{
 		menu.add(0, MENU_SELECT, 0, "Select").setIcon(android.R.drawable.ic_menu_info_details);
@@ -89,6 +96,7 @@ public class ContactGrid extends Activity
 	}
 	
 	/** Handle menu items */
+	@Override
 	public boolean onOptionsItemSelected(MenuItem item)
 	{
 		switch(item.getItemId())
@@ -99,6 +107,29 @@ public class ContactGrid extends Activity
 		}
 		
 		return false;
+	}
+	
+	/** Handle return values from other activities */
+	@Override
+	public void onActivityResult(int reqCode, int resultCode, Intent data)
+	{
+		super.onActivityResult(reqCode, resultCode, data);
+		
+		switch(reqCode)
+		{
+		case PICK_CONTACT:
+			if (resultCode == Activity.RESULT_OK)
+			{
+				int index = data.getIntExtra("ajbobo.contactgrid.selindex", -1);
+				Uri contactdata = data.getData();
+				Cursor c = managedQuery(contactdata, null, null, null, null);
+				if (c.moveToFirst())
+				{
+					String name = c.getString(c.getColumnIndexOrThrow(People.NAME));	
+					Toast.makeText(ContactGrid.this, name + " " + index, Toast.LENGTH_SHORT).show();
+				}
+			}
+		}
 	}
 	
 	/** Return the current mode */
@@ -125,9 +156,15 @@ public class ContactGrid extends Activity
 		else if (_currentmode == MODE_ADD)
 		{
 			if (_savedIDs[index] == -1)
-				_savedIDs[index] = index; // TODO: Should open a Contact list so that the user can select a Contant to add to the Grid
+			{
+				//_savedIDs[index] = index; // TODO: Should open a Contact list so that the user can select a Contant to add to the Grid
+				Intent intent = new Intent(Intent.ACTION_PICK,People.CONTENT_URI).putExtra("ajbobo.contactgrid.selindex", index);
+				startActivityForResult(intent, PICK_CONTACT);
+			}
 			else
+			{
 				Toast.makeText(ContactGrid.this, "That space is already taken", Toast.LENGTH_SHORT).show();
+			}
 		}
 		else if (_currentmode == MODE_REMOVE)
 		{
