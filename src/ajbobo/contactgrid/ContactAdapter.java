@@ -48,8 +48,7 @@ public class ContactAdapter extends BaseAdapter
 			imageView = (ImageView) convertView;
 		}
 
-		int id = context.getID(position);
-		if (id == -1) // Nothing assigned
+		if (!context.hasContact(position)) // Nothing assigned
 			imageView.setImageResource(R.drawable.question);
 		else
 			imageView.setImageResource(R.drawable.android); // TODO: This needs to be the Contact's picture, if it exists

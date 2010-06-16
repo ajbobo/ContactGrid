@@ -7,7 +7,7 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.Contacts.People;
+import android.provider.ContactsContract;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
@@ -25,6 +25,8 @@ public class ContactGrid extends Activity
 	public static final int MODE_ADD = 2;
 	public static final int MODE_REMOVE = 3;
 	
+	public static final String NO_CONTACT = "<none>";
+
 	// Constants that are internal to this class
 	private static final int MENU_SELECT = Menu.FIRST;
 	private static final int MENU_ADD = Menu.FIRST + 1;
@@ -33,24 +35,26 @@ public class ContactGrid extends Activity
 	private static final int PICK_CONTACT = 1;
 	
 	// Class variables
-	private int _currentmode = 0;
-	private int[] _savedIDs;
+	private int _currentmode;
+	private String[] _savedKeys;
+	private int _currentindex;
 	
 	/** Called when the activity is first created. */
 	@Override
-	public void onCreate(Bundle savedInstanceState)
+	protected void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
 		
 		// Initialize class variables
 		_currentmode = MODE_SELECT;
+		_currentindex = -1;
 		
-		_savedIDs = new int[MAX_ENTRIES];
+		_savedKeys = new String[MAX_ENTRIES];
 		SharedPreferences settings = getPreferences(0);
 		for (int x = 0; x < MAX_ENTRIES; x++)
 		{
-			_savedIDs[x] = settings.getInt("SavedID" + x, -1);
+			_savedKeys[x] = settings.getString("SavedID" + x, NO_CONTACT);
 		}
 
 		// Initialize the grid
@@ -79,7 +83,7 @@ public class ContactGrid extends Activity
 		SharedPreferences.Editor editor = settings.edit();
 		for (int x = 0; x < MAX_ENTRIES; x++)
 		{
-			editor.putInt("SavedID" + x, _savedIDs[x]);
+			editor.putString("SavedID" + x, _savedKeys[x]);
 		}
 		editor.commit();
 	}
@@ -120,28 +124,22 @@ public class ContactGrid extends Activity
 		case PICK_CONTACT:
 			if (resultCode == Activity.RESULT_OK)
 			{
-				int index = data.getIntExtra("ajbobo.contactgrid.selindex", -1);
+				int index = _currentindex;
 				Uri contactdata = data.getData();
 				Cursor c = managedQuery(contactdata, null, null, null, null);
 				if (c.moveToFirst())
 				{
-					String name = c.getString(c.getColumnIndexOrThrow(People.NAME));	
-					Toast.makeText(ContactGrid.this, name + " " + index, Toast.LENGTH_SHORT).show();
+					String key = c.getString(c.getColumnIndexOrThrow(ContactsContract.Contacts._ID));	
+					_savedKeys[index] = key;
 				}
 			}
+			_currentindex = -1;
+			
+			// Refresh the grid
+			GridView grid = (GridView) findViewById(R.id.gridview);
+			grid.invalidateViews();
+			break;
 		}
-	}
-	
-	/** Return the current mode */
-	public int currentMode()
-	{
-		return _currentmode;
-	}
-	
-	/** Return the specified saved id */
-	public int getID(int id)
-	{
-		return _savedIDs[id];
 	}
 	
 	/** Deal with the selected item based on the current mode */
@@ -150,25 +148,30 @@ public class ContactGrid extends Activity
 		// Figure out what to do with the selected item
 		if (_currentmode == MODE_SELECT)
 		{
-			if (_savedIDs[index] != -1)
-				Toast.makeText(ContactGrid.this, "Selected: " + index, Toast.LENGTH_SHORT).show(); // TODO: Should open the Contact's Details
+			if (hasContact(index))
+			{
+				Uri lookupuri = Uri.parse("content://contacts/people/" + _savedKeys[index]);
+				Intent intent = new Intent(Intent.ACTION_VIEW,lookupuri);
+				startActivity(intent);
+			}
 		}
 		else if (_currentmode == MODE_ADD)
 		{
-			if (_savedIDs[index] == -1)
+			if (!hasContact(index))
 			{
-				//_savedIDs[index] = index; // TODO: Should open a Contact list so that the user can select a Contant to add to the Grid
-				Intent intent = new Intent(Intent.ACTION_PICK,People.CONTENT_URI).putExtra("ajbobo.contactgrid.selindex", index);
+				// Opens a Contact list so that the user can select a Contant to add to the Grid
+				_currentindex = index;
+				Intent intent = new Intent(Intent.ACTION_PICK,ContactsContract.Contacts.CONTENT_URI);
 				startActivityForResult(intent, PICK_CONTACT);
 			}
 			else
 			{
-				Toast.makeText(ContactGrid.this, "That space is already taken", Toast.LENGTH_SHORT).show();
+				showToast("That space is already taken");
 			}
 		}
 		else if (_currentmode == MODE_REMOVE)
 		{
-			_savedIDs[index] = -1;
+			_savedKeys[index] = NO_CONTACT;
 		}
 		
 		// Refresh the grid
@@ -188,5 +191,22 @@ public class ContactGrid extends Activity
 		}
 		
 		setTitle(title);
+	}
+	
+	/** Display a short Toast with the specified text */
+	private void showToast(String msg)
+	{
+		Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
+	}
+	
+	/** Return whether or not there's an entry in a grid space */
+	public boolean hasContact(int index)
+	{
+		String id = _savedKeys[index];
+		
+		if (id.compareTo(NO_CONTACT) == 0)
+			return false;
+		
+		return true;
 	}
 }
