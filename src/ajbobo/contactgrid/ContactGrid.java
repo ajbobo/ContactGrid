@@ -1,10 +1,15 @@
 package ajbobo.contactgrid;
 
+import java.io.InputStream;
+
 import ajbobo.contactgrid.ContactGrid;
 import android.app.Activity;
+import android.content.ContentUris;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
@@ -150,7 +155,7 @@ public class ContactGrid extends Activity
 		{
 			if (hasContact(index))
 			{
-				Uri lookupuri = Uri.parse("content://contacts/people/" + _savedKeys[index]);
+				Uri lookupuri = getGridURI(index);
 				Intent intent = new Intent(Intent.ACTION_VIEW,lookupuri);
 				startActivity(intent);
 			}
@@ -208,5 +213,30 @@ public class ContactGrid extends Activity
 			return false;
 		
 		return true;
+	}
+	
+	/** Returns the URI of the person in the specified grid */
+	public Uri getGridURI(int index)
+	{
+		if (!hasContact(index))
+			return null;
+		
+		Uri griduri = ContentUris.withAppendedId(ContactsContract.Contacts.CONTENT_URI, Long.parseLong(_savedKeys[index]));
+		
+		return griduri;
+	}
+	
+	/** Returns the photo assigned to the specified grid */
+	public Bitmap getGridPhoto(int index)
+	{
+		Uri contacturi = getGridURI(index);
+		if (contacturi == null)
+			return null;
+		
+		InputStream stream = ContactsContract.Contacts.openContactPhotoInputStream(getContentResolver(), contacturi);
+		if (stream == null)
+			return null;
+		
+		return BitmapFactory.decodeStream(stream);
 	}
 }

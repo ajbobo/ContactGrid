@@ -1,6 +1,7 @@
 package ajbobo.contactgrid;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -49,9 +50,18 @@ public class ContactAdapter extends BaseAdapter
 		}
 
 		if (!context.hasContact(position)) // Nothing assigned
+		{
 			imageView.setImageResource(R.drawable.question);
+		}
 		else
-			imageView.setImageResource(R.drawable.android); // TODO: This needs to be the Contact's picture, if it exists
+		{
+			Bitmap bitmap = context.getGridPhoto(position);
+			if (bitmap != null)
+				imageView.setImageBitmap(bitmap); // The contact has a photo - use it
+			else
+				imageView.setImageResource(R.drawable.android); // The contact does not have a photo - use a place-holder image
+			
+		}
 		return imageView;
 	}
 
