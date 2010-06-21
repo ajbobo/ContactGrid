@@ -9,16 +9,12 @@
 	<ImageView
 		android:id="@+id/icon_image"
 		android:layout_width="80px"
-		android:layout_height="78px">
-	</ImageView>
+		android:layout_height="78px" />
 	
 	<TextView
 		android:id="@+id/icon_text"
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
-		android:text="TextView"
-		android:gravity="center_horizontal"
-		android:textColorHighlight="#656565">
-	</TextView>
+		android:gravity="center_horizontal" />
 	
 </LinearLayout>
