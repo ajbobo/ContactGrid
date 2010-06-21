@@ -17,6 +17,7 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.GridView;
 import android.widget.Toast;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -237,5 +238,26 @@ public class ContactGrid extends Activity
 			return null;
 		
 		return BitmapFactory.decodeStream(stream);
+	}
+	
+	public String getGridName(int index)
+	{
+		Uri contacturi = getGridURI(index);
+		if (contacturi == null)
+			return "<unknown>";
+		
+		Cursor c = managedQuery(contacturi, null, null, null, null);
+		if (c.moveToFirst())
+		{
+			String name = c.getString(c.getColumnIndexOrThrow(ContactsContract.Contacts.DISPLAY_NAME));	
+			return name;
+		}
+		
+		return "<null>";
+	}
+	
+	public LayoutInflater getGridInflator()
+	{
+		return getLayoutInflater();
 	}
 }
