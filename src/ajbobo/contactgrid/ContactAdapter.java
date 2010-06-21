@@ -42,7 +42,7 @@ public class ContactAdapter extends BaseAdapter
 			imageView = new ImageView(context);
 			imageView.setLayoutParams(new GridView.LayoutParams(85, 85));
 			imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
-			imageView.setPadding(8, 8, 8, 8);
+			imageView.setPadding(0, 0, 0, 0);
 		} 
 		else
 		{
