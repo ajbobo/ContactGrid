@@ -1,7 +1,6 @@
 package ajbobo.contactgrid;
 
 import java.io.InputStream;
-
 import ajbobo.contactgrid.ContactGrid;
 import android.app.Activity;
 import android.content.ContentUris;
@@ -26,22 +25,22 @@ public class ContactGrid extends Activity
 	// Constants that are available to other classes
 	public static final int MAX_ENTRIES = 12;
 
-	public static final int MODE_SELECT = 1;
-	public static final int MODE_ADD = 2;
-	public static final int MODE_REMOVE = 3;
-	
-	public static final String NO_CONTACT = "<none>";
-
 	// Constants that are internal to this class
 	private static final int MENU_SELECT = Menu.FIRST;
 	private static final int MENU_ADD = Menu.FIRST + 1;
 	private static final int MENU_REMOVE = Menu.FIRST + 2;
 	
+	private static final int MODE_SELECT = 1;
+	private static final int MODE_ADD = 2;
+	private static final int MODE_REMOVE = 3;
+
 	private static final int PICK_CONTACT = 1;
+	
+	private static final long NO_CONTACT = -1;
 	
 	// Class variables
 	private int _currentmode;
-	private String[] _savedKeys;
+	private long[] _savedKeys;
 	private int _currentindex;
 	
 	/** Called when the activity is first created. */
@@ -55,11 +54,11 @@ public class ContactGrid extends Activity
 		_currentmode = MODE_SELECT;
 		_currentindex = -1;
 		
-		_savedKeys = new String[MAX_ENTRIES];
+		_savedKeys = new long[MAX_ENTRIES];
 		SharedPreferences settings = getPreferences(0);
 		for (int x = 0; x < MAX_ENTRIES; x++)
 		{
-			_savedKeys[x] = settings.getString("SavedID" + x, NO_CONTACT);
+			_savedKeys[x] = settings.getLong("SavedID" + x, NO_CONTACT);
 		}
 
 		// Initialize the grid
@@ -88,7 +87,7 @@ public class ContactGrid extends Activity
 		SharedPreferences.Editor editor = settings.edit();
 		for (int x = 0; x < MAX_ENTRIES; x++)
 		{
-			editor.putString("SavedID" + x, _savedKeys[x]);
+			editor.putLong("SavedID" + x, _savedKeys[x]);
 		}
 		editor.commit();
 	}
@@ -134,7 +133,7 @@ public class ContactGrid extends Activity
 				Cursor c = managedQuery(contactdata, null, null, null, null);
 				if (c.moveToFirst())
 				{
-					String key = c.getString(c.getColumnIndexOrThrow(ContactsContract.Contacts._ID));	
+					long key = c.getLong(c.getColumnIndexOrThrow(ContactsContract.Contacts._ID));	
 					_savedKeys[index] = key;
 				}
 			}
@@ -207,9 +206,9 @@ public class ContactGrid extends Activity
 	/** Return whether or not there's an entry in a grid space */
 	public boolean hasContact(int index)
 	{
-		String id = _savedKeys[index];
+		long id = _savedKeys[index];
 		
-		if (id.compareTo(NO_CONTACT) == 0)
+		if (id == NO_CONTACT)
 			return false;
 		
 		return true;
@@ -221,7 +220,7 @@ public class ContactGrid extends Activity
 		if (!hasContact(index))
 			return null;
 		
-		Uri griduri = ContentUris.withAppendedId(ContactsContract.Contacts.CONTENT_URI, Long.parseLong(_savedKeys[index]));
+		Uri griduri = ContentUris.withAppendedId(ContactsContract.Contacts.CONTENT_URI, _savedKeys[index]);
 		
 		return griduri;
 	}
