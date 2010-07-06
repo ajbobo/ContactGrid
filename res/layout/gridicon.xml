@@ -13,7 +13,7 @@
 	
 	<TextView
 		android:id="@+id/icon_text"
-		android:layout_width="80dp"
+		android:layout_width="fill_parent"
 		android:layout_height="19dp"
 		android:gravity="center_horizontal" />
 	
