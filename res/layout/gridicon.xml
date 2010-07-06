@@ -8,13 +8,13 @@
 	
 	<ImageView
 		android:id="@+id/icon_image"
-		android:layout_width="80px"
-		android:layout_height="78px" />
+		android:layout_width="80dp"
+		android:layout_height="78dp" />
 	
 	<TextView
 		android:id="@+id/icon_text"
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
+		android:layout_width="80dp"
+		android:layout_height="19dp"
 		android:gravity="center_horizontal" />
 	
 </LinearLayout>
