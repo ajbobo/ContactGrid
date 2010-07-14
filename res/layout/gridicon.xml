@@ -8,8 +8,8 @@
 	
 	<ImageView
 		android:id="@+id/icon_image"
-		android:layout_width="80dp"
-		android:layout_height="78dp" />
+		android:layout_width="fill_parent"
+		android:layout_height="84dp" />
 	
 	<TextView
 		android:id="@+id/icon_text"

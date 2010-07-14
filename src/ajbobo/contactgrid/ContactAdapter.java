@@ -52,7 +52,6 @@ public class ContactAdapter extends BaseAdapter
 		{
 			tv.setText("");
 			iv.setImageResource(R.drawable.question);
-
 		}
 		else
 		{
@@ -65,5 +64,4 @@ public class ContactAdapter extends BaseAdapter
 		}
 		return v;
 	}
-
 }
