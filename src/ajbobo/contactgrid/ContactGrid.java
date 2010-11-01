@@ -30,31 +30,29 @@ public class ContactGrid extends Activity
 	private static final int MENU_SELECT = Menu.FIRST;
 	private static final int MENU_ADD = Menu.FIRST + 1;
 	private static final int MENU_REMOVE = Menu.FIRST + 2;
-	
+
 	private static final int MODE_SELECT = 1;
 	private static final int MODE_ADD = 2;
 	private static final int MODE_REMOVE = 3;
 
 	private static final int PICK_CONTACT = 1;
-	
+
 	private static final long NO_CONTACT = -1;
-	
+
 	// Class variables
 	private int _currentmode;
 	private long[] _savedKeys;
-	private int _currentindex;
-	
+
 	/** Called when the activity is first created. */
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
-		
+
 		// Initialize class variables
 		_currentmode = MODE_SELECT;
-		_currentindex = -1;
-		
+
 		_savedKeys = new long[MAX_ENTRIES];
 		SharedPreferences settings = getPreferences(0);
 		for (int x = 0; x < MAX_ENTRIES; x++)
@@ -73,17 +71,17 @@ public class ContactGrid extends Activity
 				HandleClickedItem(position);
 			}
 		});
-		
+
 		// Initialize the title bar
 		setWindowTitle();
 	}
-	
+
 	/** Called when the activity is stopped */
 	@Override
 	protected void onStop()
 	{
 		super.onStop();
-		
+
 		SharedPreferences settings = getPreferences(0);
 		SharedPreferences.Editor editor = settings.edit();
 		for (int x = 0; x < MAX_ENTRIES; x++)
@@ -92,7 +90,7 @@ public class ContactGrid extends Activity
 		}
 		editor.commit();
 	}
-	
+
 	/** Create menu items */
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu)
@@ -100,53 +98,55 @@ public class ContactGrid extends Activity
 		menu.add(0, MENU_SELECT, 0, "Select").setIcon(android.R.drawable.ic_menu_info_details);
 		menu.add(0, MENU_ADD, 0, "Add").setIcon(android.R.drawable.ic_menu_add);
 		menu.add(0, MENU_REMOVE, 0, "Remove").setIcon(android.R.drawable.ic_menu_delete);
-		
+
 		return true;
 	}
-	
+
 	/** Handle menu items */
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item)
 	{
-		switch(item.getItemId())
+		switch (item.getItemId())
 		{
-		case MENU_SELECT:	_currentmode = MODE_SELECT; setWindowTitle();	return true;
-		case MENU_ADD:		_currentmode = MODE_ADD; setWindowTitle();		return true;
-		case MENU_REMOVE:	_currentmode = MODE_REMOVE; setWindowTitle();	return true;
+		case MENU_SELECT:	_currentmode = MODE_SELECT;	setWindowTitle();	return true;
+		case MENU_ADD:		_currentmode = MODE_ADD;		setWindowTitle();	return true;
+		case MENU_REMOVE:	_currentmode = MODE_REMOVE;	setWindowTitle();	return true;
 		}
-		
+
 		return false;
 	}
-	
+
 	/** Handle return values from other activities */
 	@Override
 	public void onActivityResult(int reqCode, int resultCode, Intent data)
 	{
 		super.onActivityResult(reqCode, resultCode, data);
 		
-		switch(reqCode)
+		// The request code has the real code and the index embedded in it
+		int realcode = reqCode / 100;
+		int index = reqCode % 100;
+
+		switch (realcode)
 		{
 		case PICK_CONTACT:
 			if (resultCode == Activity.RESULT_OK)
 			{
-				int index = _currentindex;
 				Uri contactdata = data.getData();
 				Cursor c = managedQuery(contactdata, null, null, null, null);
 				if (c.moveToFirst())
 				{
-					long key = c.getLong(c.getColumnIndexOrThrow(ContactsContract.Contacts._ID));	
+					long key = c.getLong(c.getColumnIndexOrThrow(ContactsContract.Contacts._ID));
 					_savedKeys[index] = key;
 				}
 			}
-			_currentindex = -1;
-			
+
 			// Refresh the grid
 			GridView grid = (GridView) findViewById(R.id.gridview);
 			grid.invalidateViews();
 			break;
 		}
 	}
-	
+
 	/** Deal with the selected item based on the current mode */
 	private void HandleClickedItem(int index)
 	{
@@ -156,7 +156,7 @@ public class ContactGrid extends Activity
 			if (hasContact(index))
 			{
 				Uri lookupuri = getGridURI(index);
-				Intent intent = new Intent(Intent.ACTION_VIEW,lookupuri);
+				Intent intent = new Intent(Intent.ACTION_VIEW, lookupuri);
 				startActivity(intent);
 			}
 		}
@@ -165,9 +165,8 @@ public class ContactGrid extends Activity
 			if (!hasContact(index))
 			{
 				// Opens a Contact list so that the user can select a Contant to add to the Grid
-				_currentindex = index;
-				Intent intent = new Intent(Intent.ACTION_PICK,ContactsContract.Contacts.CONTENT_URI);
-				startActivityForResult(intent, PICK_CONTACT);
+				Intent intent = new Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI);
+				startActivityForResult(intent, PICK_CONTACT * 100 + index); // Merge the request code and the index into a single value
 			}
 			else
 			{
@@ -178,84 +177,84 @@ public class ContactGrid extends Activity
 		{
 			_savedKeys[index] = NO_CONTACT;
 		}
-		
+
 		// Refresh the grid
 		GridView grid = (GridView) findViewById(R.id.gridview);
 		grid.invalidateViews();
 	}
-	
+
 	/** Sets the window's title based on the current mode */
 	private void setWindowTitle()
 	{
 		String title = "Contact Grid - ";
 		switch (_currentmode)
 		{
-		case MODE_SELECT:	title += "Select Contact"; break;
-		case MODE_ADD:		title += "Add Contact"; break;
-		case MODE_REMOVE:	title += "Remove Contact"; break;
+		case MODE_SELECT:	title += "Select Contact";	break;
+		case MODE_ADD:		title += "Add Contact";		break;
+		case MODE_REMOVE:	title += "Remove Contact";	break;
 		}
-		
+
 		setTitle(title);
 	}
-	
+
 	/** Display a short Toast with the specified text */
 	private void showToast(String msg)
 	{
 		Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
 	}
-	
+
 	/** Return whether or not there's an entry in a grid space */
 	public boolean hasContact(int index)
 	{
 		long id = _savedKeys[index];
-		
+
 		if (id == NO_CONTACT)
 			return false;
-		
+
 		return true;
 	}
-	
+
 	/** Returns the URI of the person in the specified grid */
 	public Uri getGridURI(int index)
 	{
 		if (!hasContact(index))
 			return null;
-		
+
 		Uri griduri = ContentUris.withAppendedId(ContactsContract.Contacts.CONTENT_URI, _savedKeys[index]);
-		
+
 		return griduri;
 	}
-	
+
 	/** Returns the photo assigned to the specified grid */
 	public Bitmap getGridPhoto(int index)
 	{
 		Uri contacturi = getGridURI(index);
 		if (contacturi == null)
 			return null;
-		
+
 		InputStream stream = ContactsContract.Contacts.openContactPhotoInputStream(getContentResolver(), contacturi);
 		if (stream == null)
 			return null;
-		
+
 		return BitmapFactory.decodeStream(stream);
 	}
-	
+
 	public String getGridName(int index)
 	{
 		Uri contacturi = getGridURI(index);
 		if (contacturi == null)
 			return "<unknown>";
-		
+
 		Cursor c = managedQuery(contacturi, null, null, null, null);
 		if (c.moveToFirst())
 		{
-			String name = c.getString(c.getColumnIndexOrThrow(ContactsContract.Contacts.DISPLAY_NAME));	
+			String name = c.getString(c.getColumnIndexOrThrow(ContactsContract.Contacts.DISPLAY_NAME));
 			return name;
 		}
-		
+
 		return "<null>";
 	}
-	
+
 	public LayoutInflater getGridInflator()
 	{
 		return getLayoutInflater();
