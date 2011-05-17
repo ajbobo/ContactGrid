@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="hello">Hello World, ContactGrid!</string>
     <string name="app_name">Contact Grid</string>
+    <string name="pref_category_layout">Layout</string>
+    <string name="pref_category_behavior">Behavior</string>
+    <string name="pref_numrows">Number of Rows</string>
+    <string name="pref_numcols">Number of Columns</string>
+    <string name="pref_showmessages">Show Messages</string>
 </resources>

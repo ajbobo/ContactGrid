@@ -20,7 +20,7 @@ public class ContactAdapter extends BaseAdapter
 
 	public int getCount()
 	{
-		return ContactGrid.MAX_ENTRIES;
+		return context.getNumCols() * context.getNumRows();
 	}
 
 	public Object getItem(int arg0)

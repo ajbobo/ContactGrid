@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory android:title="@string/pref_category_layout">
+        <ListPreference android:title="@string/pref_numrows" android:key="preference_numrows" android:entries="@array/list_numbers" android:entryValues="@array/list_numbers"></ListPreference>
+        <ListPreference android:title="@string/pref_numcols" android:key="preference_numcols" android:entries="@array/list_numbers" android:entryValues="@array/list_numbers"></ListPreference>
+    </PreferenceCategory>
+    <PreferenceCategory android:title="@string/pref_category_behavior">
+        <CheckBoxPreference android:key="preference_messages" android:title="@string/pref_showmessages"></CheckBoxPreference>
+    </PreferenceCategory>
+</PreferenceScreen>

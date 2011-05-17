@@ -11,6 +11,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.provider.ContactsContract;
 import android.view.View;
 import android.widget.AdapterView;
@@ -30,18 +31,23 @@ public class ContactGrid extends Activity
 	private static final int MENU_SELECT = Menu.FIRST;
 	private static final int MENU_ADD = Menu.FIRST + 1;
 	private static final int MENU_REMOVE = Menu.FIRST + 2;
+	private static final int MENU_PREFERENCES = Menu.FIRST + 3;
 
 	private static final int MODE_SELECT = 1;
 	private static final int MODE_ADD = 2;
 	private static final int MODE_REMOVE = 3;
 
 	private static final int PICK_CONTACT = 1;
+	private static final int CHANGE_PREFS = 2;
 
 	private static final long NO_CONTACT = -1;
 
 	// Class variables
 	private int _currentmode;
 	private long[] _savedKeys;
+	private boolean _showmessages;
+	private int _numrows;
+	private int _numcols;
 
 	/** Called when the activity is first created. */
 	@Override
@@ -49,20 +55,23 @@ public class ContactGrid extends Activity
 	{
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
-
+		
 		// Initialize class variables
 		_currentmode = MODE_SELECT;
+		GetPreferences();
 
-		_savedKeys = new long[MAX_ENTRIES];
-		SharedPreferences settings = getPreferences(0);
-		for (int x = 0; x < MAX_ENTRIES; x++)
+		int entries = _numrows * _numcols;
+		_savedKeys = new long[entries];
+		SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
+		for (int x = 0; x < entries; x++)
 		{
 			_savedKeys[x] = settings.getLong("SavedID" + x, NO_CONTACT);
 		}
-
+		
 		// Initialize the grid
 		GridView grid = (GridView) findViewById(R.id.gridview);
 		grid.setAdapter(new ContactAdapter(this));
+		grid.setNumColumns(_numcols);
 
 		grid.setOnItemClickListener(new OnItemClickListener()
 		{
@@ -82,7 +91,7 @@ public class ContactGrid extends Activity
 	{
 		super.onStop();
 
-		SharedPreferences settings = getPreferences(0);
+		SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
 		SharedPreferences.Editor editor = settings.edit();
 		for (int x = 0; x < MAX_ENTRIES; x++)
 		{
@@ -98,6 +107,7 @@ public class ContactGrid extends Activity
 		menu.add(0, MENU_SELECT, 0, "Select").setIcon(android.R.drawable.ic_menu_info_details);
 		menu.add(0, MENU_ADD, 0, "Add").setIcon(android.R.drawable.ic_menu_add);
 		menu.add(0, MENU_REMOVE, 0, "Remove").setIcon(android.R.drawable.ic_menu_delete);
+		menu.add(0, MENU_PREFERENCES, 0, "Preferences").setIcon(android.R.drawable.ic_menu_preferences);
 
 		return true;
 	}
@@ -111,6 +121,7 @@ public class ContactGrid extends Activity
 		case MENU_SELECT:	_currentmode = MODE_SELECT;	setWindowTitle();	return true;
 		case MENU_ADD:		_currentmode = MODE_ADD;		setWindowTitle();	return true;
 		case MENU_REMOVE:	_currentmode = MODE_REMOVE;	setWindowTitle();	return true;
+		case MENU_PREFERENCES: LaunchPreferences(); return true;
 		}
 
 		return false;
@@ -144,7 +155,53 @@ public class ContactGrid extends Activity
 			GridView grid = (GridView) findViewById(R.id.gridview);
 			grid.invalidateViews();
 			break;
+		case CHANGE_PREFS:
+			// Update the preferences
+			GetPreferences();
+			
+			// Resize the grid if possible - FINISH ME
+			break;
 		}
+	}
+	
+	/** Read the Preferences */
+	private void GetPreferences()
+	{
+		SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
+		_showmessages = settings.getBoolean("preference_messages", true);
+		
+		// I'm sure there's a better way to do this - http://stackoverflow.com/questions/3206765/number-preferences-in-preference-activity-in-android
+		String val = settings.getString("preference_numrows", "Four");
+		if (val.equalsIgnoreCase("one")) _numrows = 1;
+		else if (val.equalsIgnoreCase("two")) _numrows = 2;
+		else if (val.equalsIgnoreCase("three")) _numrows = 3;
+		else if (val.equalsIgnoreCase("four")) _numrows = 4;
+		else if (val.equalsIgnoreCase("five")) _numrows = 5;
+		else if (val.equalsIgnoreCase("six")) _numrows = 6;
+		else if (val.equalsIgnoreCase("seven")) _numrows = 7;
+		else if (val.equalsIgnoreCase("eight")) _numrows = 8;
+		else if (val.equalsIgnoreCase("nine")) _numrows = 9;
+		else if (val.equalsIgnoreCase("ten")) _numrows = 10;
+		
+		val = settings.getString("preference_numcols", "Three");
+		if (val.equalsIgnoreCase("one")) _numcols = 1;
+		else if (val.equalsIgnoreCase("two")) _numcols = 2;
+		else if (val.equalsIgnoreCase("three")) _numcols = 3;
+		else if (val.equalsIgnoreCase("four")) _numcols = 4;
+		else if (val.equalsIgnoreCase("five")) _numcols = 5;
+		else if (val.equalsIgnoreCase("six")) _numcols = 6;
+		else if (val.equalsIgnoreCase("seven")) _numcols = 7;
+		else if (val.equalsIgnoreCase("eight")) _numcols = 8;
+		else if (val.equalsIgnoreCase("nine")) _numcols = 9;
+		else if (val.equalsIgnoreCase("ten")) _numcols = 10;
+	}
+	
+	/** Launch the Preferences activity */
+	private void LaunchPreferences()
+	{
+		Intent intent = new Intent();
+		intent.setClass(this, ContactGridPreferences.class);
+		startActivityForResult(intent, CHANGE_PREFS * 100); // RequestCodes have to be multiplied by 100
 	}
 
 	/** Deal with the selected item based on the current mode */
@@ -158,6 +215,10 @@ public class ContactGrid extends Activity
 				Uri lookupuri = getGridURI(index);
 				Intent intent = new Intent(Intent.ACTION_VIEW, lookupuri);
 				startActivity(intent);
+			}
+			else if (_showmessages)
+			{
+				showToast("You must add a contact to that space first");
 			}
 		}
 		else if (_currentmode == MODE_ADD)
@@ -258,5 +319,15 @@ public class ContactGrid extends Activity
 	public LayoutInflater getGridInflator()
 	{
 		return getLayoutInflater();
+	}
+	
+	public int getNumRows()
+	{
+		return _numrows;
+	}
+	
+	public int getNumCols()
+	{
+		return _numcols;
 	}
 }
