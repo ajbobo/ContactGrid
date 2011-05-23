@@ -20,7 +20,7 @@ public class ContactAdapter extends BaseAdapter
 
 	public int getCount()
 	{
-		return context.getNumCols() * context.getNumRows();
+		return context.getNumEntries();
 	}
 
 	public Object getItem(int arg0)

@@ -48,6 +48,7 @@ public class ContactGrid extends Activity
 	private boolean _showmessages;
 	private int _numrows;
 	private int _numcols;
+	private int _numentries;
 
 	/** Called when the activity is first created. */
 	@Override
@@ -60,10 +61,10 @@ public class ContactGrid extends Activity
 		_currentmode = MODE_SELECT;
 		GetPreferences();
 
-		int entries = _numrows * _numcols;
-		_savedKeys = new long[entries];
+		_numentries = _numrows * _numcols;
+		_savedKeys = new long[_numentries];
 		SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
-		for (int x = 0; x < entries; x++)
+		for (int x = 0; x < _numentries; x++)
 		{
 			_savedKeys[x] = settings.getLong("SavedID" + x, NO_CONTACT);
 		}
@@ -93,7 +94,7 @@ public class ContactGrid extends Activity
 
 		SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
 		SharedPreferences.Editor editor = settings.edit();
-		for (int x = 0; x < MAX_ENTRIES; x++)
+		for (int x = 0; x < _numentries; x++)
 		{
 			editor.putLong("SavedID" + x, _savedKeys[x]);
 		}
@@ -321,13 +322,8 @@ public class ContactGrid extends Activity
 		return getLayoutInflater();
 	}
 	
-	public int getNumRows()
+	public int getNumEntries()
 	{
-		return _numrows;
-	}
-	
-	public int getNumCols()
-	{
-		return _numcols;
+		return _numentries;
 	}
 }
