@@ -24,9 +24,6 @@ import android.view.MenuItem;
 
 public class ContactGrid extends Activity
 {
-	// Constants that are available to other classes
-	public static final int MAX_ENTRIES = 12;
-
 	// Constants that are internal to this class
 	private static final int MENU_SELECT = Menu.FIRST;
 	private static final int MENU_ADD = Menu.FIRST + 1;
@@ -61,8 +58,6 @@ public class ContactGrid extends Activity
 		_currentmode = MODE_SELECT;
 		GetPreferences();
 
-		_numentries = _numrows * _numcols;
-		_savedKeys = new long[_numentries];
 		SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
 		for (int x = 0; x < _numentries; x++)
 		{
@@ -138,6 +133,8 @@ public class ContactGrid extends Activity
 		int realcode = reqCode / 100;
 		int index = reqCode % 100;
 
+		GridView grid = (GridView) findViewById(R.id.gridview);
+
 		switch (realcode)
 		{
 		case PICK_CONTACT:
@@ -153,14 +150,15 @@ public class ContactGrid extends Activity
 			}
 
 			// Refresh the grid
-			GridView grid = (GridView) findViewById(R.id.gridview);
 			grid.invalidateViews();
 			break;
 		case CHANGE_PREFS:
 			// Update the preferences
 			GetPreferences();
 			
-			// Resize the grid if possible - FINISH ME
+			// Resize the grid
+			grid.setNumColumns(_numcols);
+			grid.invalidateViews();
 			break;
 		}
 	}
@@ -195,6 +193,21 @@ public class ContactGrid extends Activity
 		else if (val.equalsIgnoreCase("eight")) _numcols = 8;
 		else if (val.equalsIgnoreCase("nine")) _numcols = 9;
 		else if (val.equalsIgnoreCase("ten")) _numcols = 10;
+		
+		_numentries = _numrows * _numcols;
+		
+		// Recreate the saved keys array
+		long temp[] = new long[_numentries];
+		int keycnt = 0;
+		if (_savedKeys != null)
+		{
+			keycnt = _savedKeys.length;
+			for (int x = 0; x < Math.min(keycnt, temp.length); x++)
+				temp[x] = _savedKeys[x];
+		}
+		for (int x = keycnt; x < temp.length; x++) // Fill the new spaces in the array with NO_CONTACT
+			temp[x] = NO_CONTACT;
+		_savedKeys = temp;
 	}
 	
 	/** Launch the Preferences activity */
@@ -230,7 +243,7 @@ public class ContactGrid extends Activity
 				Intent intent = new Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI);
 				startActivityForResult(intent, PICK_CONTACT * 100 + index); // Merge the request code and the index into a single value
 			}
-			else
+			else if (_showmessages)
 			{
 				showToast("That space is already taken");
 			}
@@ -317,11 +330,6 @@ public class ContactGrid extends Activity
 		return "<null>";
 	}
 
-	public LayoutInflater getGridInflator()
-	{
-		return getLayoutInflater();
-	}
-	
 	public int getNumEntries()
 	{
 		return _numentries;
