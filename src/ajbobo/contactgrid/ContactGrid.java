@@ -18,7 +18,6 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.GridView;
 import android.widget.Toast;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 
