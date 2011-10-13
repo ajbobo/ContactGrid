@@ -12,6 +12,7 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.provider.Contacts;
 import android.provider.ContactsContract;
 import android.view.View;
 import android.widget.AdapterView;
@@ -28,6 +29,7 @@ public class ContactGrid extends Activity
 	private static final int MENU_ADD = Menu.FIRST + 1;
 	private static final int MENU_REMOVE = Menu.FIRST + 2;
 	private static final int MENU_PREFERENCES = Menu.FIRST + 3;
+	private static final int MENU_CONTACTS = Menu.FIRST + 4;
 
 	private static final int MODE_SELECT = 1;
 	private static final int MODE_ADD = 2;
@@ -99,10 +101,11 @@ public class ContactGrid extends Activity
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu)
 	{
+		menu.add(0, MENU_CONTACTS, 0, "Contacts").setIcon(R.drawable.ic_menu_cc);
+		menu.add(0, MENU_PREFERENCES, 0, "Preferences").setIcon(android.R.drawable.ic_menu_preferences);
 		menu.add(0, MENU_SELECT, 0, "Select").setIcon(android.R.drawable.ic_menu_info_details);
 		menu.add(0, MENU_ADD, 0, "Add").setIcon(android.R.drawable.ic_menu_add);
 		menu.add(0, MENU_REMOVE, 0, "Remove").setIcon(android.R.drawable.ic_menu_delete);
-		menu.add(0, MENU_PREFERENCES, 0, "Preferences").setIcon(android.R.drawable.ic_menu_preferences);
 
 		return true;
 	}
@@ -117,6 +120,7 @@ public class ContactGrid extends Activity
 		case MENU_ADD:		_currentmode = MODE_ADD;		setWindowTitle();	return true;
 		case MENU_REMOVE:	_currentmode = MODE_REMOVE;	setWindowTitle();	return true;
 		case MENU_PREFERENCES: LaunchPreferences(); return true;
+		case MENU_CONTACTS: LaunchContacts(); return true;
 		}
 
 		return false;
@@ -215,6 +219,13 @@ public class ContactGrid extends Activity
 		Intent intent = new Intent();
 		intent.setClass(this, ContactGridPreferences.class);
 		startActivityForResult(intent, CHANGE_PREFS * 100); // RequestCodes have to be multiplied by 100
+	}
+	
+	/** Launch the Android Contact Manager */
+	private void LaunchContacts()
+	{
+		Intent intent = new Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI);
+		startActivity(intent);
 	}
 
 	/** Deal with the selected item based on the current mode */
