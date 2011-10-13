@@ -224,7 +224,7 @@ public class ContactGrid extends Activity
 	/** Launch the Android Contact Manager */
 	private void LaunchContacts()
 	{
-		Intent intent = new Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI);
+		Intent intent = new Intent(Intent.ACTION_DEFAULT, ContactsContract.Contacts.CONTENT_URI);
 		startActivity(intent);
 	}
 
