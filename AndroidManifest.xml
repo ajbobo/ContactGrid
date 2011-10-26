@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
       package="ajbobo.contactgrid"
-      android:versionName="1.1" android:versionCode="6">
-    <application android:label="@string/app_name" android:icon="@drawable/people">
+      android:versionName="1.2" android:versionCode="7">
+    <application android:label="@string/app_name" android:icon="@drawable/ic_launcher_main">
         <activity android:name=".ContactGrid"
                   android:label="@string/app_name">
             <intent-filter>
