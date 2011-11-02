@@ -189,7 +189,7 @@ public class ContactGrid extends Activity
 		{
 		case POPUP_OPTIONS_CONTACT:
 	      return new AlertDialog.Builder(this)
-		      .setTitle("Edit Space")
+		      .setTitle(getGridName(index))
 		      .setItems(R.array.list_popup_options_contact, new DialogInterface.OnClickListener()
 				{
 					public void onClick(DialogInterface dialog, int which)
@@ -204,7 +204,7 @@ public class ContactGrid extends Activity
 		     .create();
 		case POPUP_OPTIONS_EMPTY:
 	      return new AlertDialog.Builder(this)
-		      .setTitle("Edit Space")
+		      .setTitle("Empty Space")
 		      .setItems(R.array.list_popup_options_empty, new DialogInterface.OnClickListener()
 				{
 					public void onClick(DialogInterface dialog, int which)
