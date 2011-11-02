@@ -1,9 +1,13 @@
 package ajbobo.contactgrid;
 
 import java.io.InputStream;
+
 import ajbobo.contactgrid.ContactGrid;
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.ContentUris;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
@@ -16,6 +20,7 @@ import android.provider.ContactsContract;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.GridView;
 import android.widget.Toast;
 import android.view.Menu;
@@ -29,7 +34,10 @@ public class ContactGrid extends Activity
 	private static final int MENU_REMOVE = Menu.FIRST + 2;
 	private static final int MENU_PREFERENCES = Menu.FIRST + 3;
 	private static final int MENU_CONTACTS = Menu.FIRST + 4;
-
+	
+	private static final int POPUP_OPTIONS_CONTACT = 1;
+	private static final int POPUP_OPTIONS_EMPTY = 2;
+	
 	private static final int MODE_SELECT = 1;
 	private static final int MODE_ADD = 2;
 	private static final int MODE_REMOVE = 3;
@@ -74,6 +82,13 @@ public class ContactGrid extends Activity
 			public void onItemClick(AdapterView<?> parent, View v, int position, long id)
 			{
 				HandleClickedItem(position);
+			}
+		});
+		grid.setOnItemLongClickListener(new OnItemLongClickListener()
+		{
+			public boolean onItemLongClick(AdapterView<?> parent, View v, int position, long id)
+			{
+				return HandleLongClickedItem(position);
 			}
 		});
 
@@ -165,6 +180,46 @@ public class ContactGrid extends Activity
 		}
 	}
 	
+	@Override
+	public Dialog onCreateDialog(int id)
+	{
+		int realid = id / 100;
+		final int index = id % 100; // This has to be final so that the internal objects I'm able to declare can see it
+		switch (realid)
+		{
+		case POPUP_OPTIONS_CONTACT:
+	      return new AlertDialog.Builder(this)
+		      .setTitle("Edit Space")
+		      .setItems(R.array.list_popup_options_contact, new DialogInterface.OnClickListener()
+				{
+					public void onClick(DialogInterface dialog, int which)
+					{
+						switch(which)
+						{
+						case 0: HandleClickedItemModeless(index, MODE_SELECT); break;
+						case 1: HandleClickedItemModeless(index, MODE_REMOVE); break;
+						}
+					}
+				})
+		     .create();
+		case POPUP_OPTIONS_EMPTY:
+	      return new AlertDialog.Builder(this)
+		      .setTitle("Edit Space")
+		      .setItems(R.array.list_popup_options_empty, new DialogInterface.OnClickListener()
+				{
+					public void onClick(DialogInterface dialog, int which)
+					{
+						switch(which)
+						{
+						case 0: HandleClickedItemModeless(index, MODE_ADD); break;
+						}
+					}
+				})
+		     .create();
+		}
+		return null;
+	}
+	
 	/** Read the Preferences */
 	private void GetPreferences()
 	{
@@ -226,6 +281,17 @@ public class ContactGrid extends Activity
 		Intent intent = new Intent(Intent.ACTION_DEFAULT, ContactsContract.Contacts.CONTENT_URI);
 		startActivity(intent);
 	}
+	
+	/** Temporarily change the mode, then handle the selected item */
+	private void HandleClickedItemModeless(int index, int mode)
+	{
+		int tempmode = _currentmode;
+		_currentmode = mode;
+		
+		HandleClickedItem(index);
+		
+		_currentmode = tempmode;
+	}
 
 	/** Deal with the selected item based on the current mode */
 	private void HandleClickedItem(int index)
@@ -265,6 +331,21 @@ public class ContactGrid extends Activity
 		// Refresh the grid
 		GridView grid = (GridView) findViewById(R.id.gridview);
 		grid.invalidateViews();
+	}
+	
+	/** Bring up a menu to valid options for the selected space */
+	private boolean HandleLongClickedItem(int index)
+	{
+		if (hasContact(index))
+		{
+			showDialog(POPUP_OPTIONS_CONTACT * 100 + index); // Merge the code and the index into a single value
+		}
+		else
+		{
+			showDialog(POPUP_OPTIONS_EMPTY * 100 + index);
+		}
+		
+		return true;
 	}
 
 	/** Sets the window's title based on the current mode */
