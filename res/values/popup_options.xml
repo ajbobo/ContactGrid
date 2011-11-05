@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string-array name="list_popup_options_contact">
-        <item>View Contact</item>
-        <item>Remove Contact</item>
+        <item>View contact</item>
+        <item>Remove contact</item>
     </string-array>
     <string-array name="list_popup_options_empty">
-        <item >Add Contact</item>
+        <item >Add contact</item>
     </string-array>
 
     

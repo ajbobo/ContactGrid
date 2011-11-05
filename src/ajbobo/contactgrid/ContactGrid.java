@@ -29,18 +29,15 @@ import android.view.MenuItem;
 public class ContactGrid extends Activity
 {
 	// Constants that are internal to this class
-	private static final int MENU_SELECT = Menu.FIRST;
-	private static final int MENU_ADD = Menu.FIRST + 1;
-	private static final int MENU_REMOVE = Menu.FIRST + 2;
-	private static final int MENU_PREFERENCES = Menu.FIRST + 3;
-	private static final int MENU_CONTACTS = Menu.FIRST + 4;
+	private static final int MENU_PREFERENCES = Menu.FIRST;
+	private static final int MENU_CONTACTS = Menu.FIRST + 1;
 	
 	private static final int POPUP_OPTIONS_CONTACT = 1;
 	private static final int POPUP_OPTIONS_EMPTY = 2;
 	
-	private static final int MODE_SELECT = 1;
-	private static final int MODE_ADD = 2;
-	private static final int MODE_REMOVE = 3;
+	private static final int ACTION_SELECT = 1;
+	private static final int ACTION_ADD = 2;
+	private static final int ACTION_REMOVE = 3;
 
 	private static final int PICK_CONTACT = 1;
 	private static final int CHANGE_PREFS = 2;
@@ -48,7 +45,6 @@ public class ContactGrid extends Activity
 	private static final long NO_CONTACT = -1;
 
 	// Class variables
-	private int _currentmode;
 	private long[] _savedKeys;
 	private boolean _showmessages;
 	private int _numrows;
@@ -63,7 +59,6 @@ public class ContactGrid extends Activity
 		setContentView(R.layout.main);
 		
 		// Initialize class variables
-		_currentmode = MODE_SELECT;
 		GetPreferences();
 
 		SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
@@ -81,7 +76,7 @@ public class ContactGrid extends Activity
 		{
 			public void onItemClick(AdapterView<?> parent, View v, int position, long id)
 			{
-				HandleClickedItem(position);
+				HandleClickedItem(position, ACTION_SELECT);
 			}
 		});
 		grid.setOnItemLongClickListener(new OnItemLongClickListener()
@@ -117,9 +112,6 @@ public class ContactGrid extends Activity
 	{
 		menu.add(0, MENU_CONTACTS, 0, "Contacts").setIcon(R.drawable.ic_menu_cc);
 		menu.add(0, MENU_PREFERENCES, 0, "Preferences").setIcon(android.R.drawable.ic_menu_preferences);
-		menu.add(0, MENU_SELECT, 0, "Select").setIcon(android.R.drawable.ic_menu_info_details);
-		menu.add(0, MENU_ADD, 0, "Add").setIcon(android.R.drawable.ic_menu_add);
-		menu.add(0, MENU_REMOVE, 0, "Remove").setIcon(android.R.drawable.ic_menu_delete);
 
 		return true;
 	}
@@ -130,9 +122,6 @@ public class ContactGrid extends Activity
 	{
 		switch (item.getItemId())
 		{
-		case MENU_SELECT:	_currentmode = MODE_SELECT;	setWindowTitle();	return true;
-		case MENU_ADD:		_currentmode = MODE_ADD;		setWindowTitle();	return true;
-		case MENU_REMOVE:	_currentmode = MODE_REMOVE;	setWindowTitle();	return true;
 		case MENU_PREFERENCES: LaunchPreferences(); return true;
 		case MENU_CONTACTS: LaunchContacts(); return true;
 		}
@@ -196,8 +185,8 @@ public class ContactGrid extends Activity
 					{
 						switch(which)
 						{
-						case 0: HandleClickedItemModeless(index, MODE_SELECT); break;
-						case 1: HandleClickedItemModeless(index, MODE_REMOVE); break;
+						case 0: HandleClickedItem(index, ACTION_SELECT); break;
+						case 1: HandleClickedItem(index, ACTION_REMOVE); break;
 						}
 					}
 				})
@@ -211,7 +200,7 @@ public class ContactGrid extends Activity
 					{
 						switch(which)
 						{
-						case 0: HandleClickedItemModeless(index, MODE_ADD); break;
+						case 0: HandleClickedItem(index, ACTION_ADD); break;
 						}
 					}
 				})
@@ -282,22 +271,11 @@ public class ContactGrid extends Activity
 		startActivity(intent);
 	}
 	
-	/** Temporarily change the mode, then handle the selected item */
-	private void HandleClickedItemModeless(int index, int mode)
-	{
-		int tempmode = _currentmode;
-		_currentmode = mode;
-		
-		HandleClickedItem(index);
-		
-		_currentmode = tempmode;
-	}
-
-	/** Deal with the selected item based on the current mode */
-	private void HandleClickedItem(int index)
+	/** Deal with the selected item */
+	private void HandleClickedItem(int index, int action)
 	{
 		// Figure out what to do with the selected item
-		if (_currentmode == MODE_SELECT)
+		if (action == ACTION_SELECT)
 		{
 			if (hasContact(index))
 			{
@@ -310,7 +288,7 @@ public class ContactGrid extends Activity
 				showToast("You must add a contact to that space first");
 			}
 		}
-		else if (_currentmode == MODE_ADD)
+		else if (action == ACTION_ADD)
 		{
 			if (!hasContact(index))
 			{
@@ -323,7 +301,7 @@ public class ContactGrid extends Activity
 				showToast("That space is already taken");
 			}
 		}
-		else if (_currentmode == MODE_REMOVE)
+		else if (action == ACTION_REMOVE)
 		{
 			_savedKeys[index] = NO_CONTACT;
 		}
@@ -351,13 +329,7 @@ public class ContactGrid extends Activity
 	/** Sets the window's title based on the current mode */
 	private void setWindowTitle()
 	{
-		String title = "Contact Grid - ";
-		switch (_currentmode)
-		{
-		case MODE_SELECT:	title += "Select Contact";	break;
-		case MODE_ADD:		title += "Add Contact";		break;
-		case MODE_REMOVE:	title += "Remove Contact";	break;
-		}
+		String title = "Contact Grid - Select Contact";
 
 		setTitle(title);
 	}
