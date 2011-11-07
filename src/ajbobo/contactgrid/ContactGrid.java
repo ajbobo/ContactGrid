@@ -111,7 +111,7 @@ public class ContactGrid extends Activity
 	public boolean onCreateOptionsMenu(Menu menu)
 	{
 		menu.add(0, MENU_CONTACTS, 0, "Contacts").setIcon(R.drawable.ic_menu_cc);
-		menu.add(0, MENU_PREFERENCES, 0, "Preferences").setIcon(android.R.drawable.ic_menu_preferences);
+		menu.add(0, MENU_PREFERENCES, 0, "Preferences").setIcon(R.drawable.ic_menu_preferences);
 
 		return true;
 	}
