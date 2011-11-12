@@ -1,4 +1,4 @@
-package ajbobo.contactgrid;
+package com.trinova.contactgrid;
 
 import android.os.Bundle;
 import android.preference.PreferenceActivity;

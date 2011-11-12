@@ -1,4 +1,4 @@
-package ajbobo.contactgrid;
+package com.trinova.contactgrid;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -15,7 +15,7 @@ public class ContactAdapter extends BaseAdapter
 
 	public ContactAdapter(Context c)
 	{
-		context = (ContactGrid)c;
+		context = (ContactGrid) c;
 	}
 
 	public int getCount()
@@ -37,17 +37,17 @@ public class ContactAdapter extends BaseAdapter
 	{
 		View v;
 		if (convertView == null) // if it's not recycled, initialize some attributes
-		{ 
+		{
 			LayoutInflater li = context.getLayoutInflater();
 			v = li.inflate(R.layout.gridicon, null);
-		} 
+		}
 		else
 		{
 			v = convertView;
 		}
 
-		TextView tv = (TextView)v.findViewById(R.id.icon_text);
-		ImageView iv = (ImageView)v.findViewById(R.id.icon_image);	
+		TextView tv = (TextView) v.findViewById(R.id.icon_text);
+		ImageView iv = (ImageView) v.findViewById(R.id.icon_image);
 		if (!context.hasContact(position)) // Nothing assigned
 		{
 			tv.setText("");

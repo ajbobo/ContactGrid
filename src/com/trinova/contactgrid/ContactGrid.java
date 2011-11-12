@@ -1,8 +1,7 @@
-package ajbobo.contactgrid;
+package com.trinova.contactgrid;
 
 import java.io.InputStream;
 
-import ajbobo.contactgrid.ContactGrid;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -31,10 +30,10 @@ public class ContactGrid extends Activity
 	// Constants that are internal to this class
 	private static final int MENU_PREFERENCES = Menu.FIRST;
 	private static final int MENU_CONTACTS = Menu.FIRST + 1;
-	
+
 	private static final int POPUP_OPTIONS_CONTACT = 1;
 	private static final int POPUP_OPTIONS_EMPTY = 2;
-	
+
 	private static final int ACTION_SELECT = 1;
 	private static final int ACTION_ADD = 2;
 	private static final int ACTION_REMOVE = 3;
@@ -57,7 +56,7 @@ public class ContactGrid extends Activity
 	{
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
-		
+
 		// Initialize class variables
 		GetPreferences();
 
@@ -66,7 +65,7 @@ public class ContactGrid extends Activity
 		{
 			_savedKeys[x] = settings.getLong("SavedID" + x, NO_CONTACT);
 		}
-		
+
 		// Initialize the grid
 		GridView grid = (GridView) findViewById(R.id.gridview);
 		grid.setAdapter(new ContactAdapter(this));
@@ -122,8 +121,12 @@ public class ContactGrid extends Activity
 	{
 		switch (item.getItemId())
 		{
-		case MENU_PREFERENCES: LaunchPreferences(); return true;
-		case MENU_CONTACTS: LaunchContacts(); return true;
+		case MENU_PREFERENCES:
+			LaunchPreferences();
+			return true;
+		case MENU_CONTACTS:
+			LaunchContacts();
+			return true;
 		}
 
 		return false;
@@ -134,7 +137,7 @@ public class ContactGrid extends Activity
 	public void onActivityResult(int reqCode, int resultCode, Intent data)
 	{
 		super.onActivityResult(reqCode, resultCode, data);
-		
+
 		// The request code has the real code and the index embedded in it
 		int realcode = reqCode / 100;
 		int index = reqCode % 100;
@@ -161,14 +164,14 @@ public class ContactGrid extends Activity
 		case CHANGE_PREFS:
 			// Update the preferences
 			GetPreferences();
-			
+
 			// Resize the grid
 			grid.setNumColumns(_numcols);
 			grid.invalidateViews();
 			break;
 		}
 	}
-	
+
 	@Override
 	public Dialog onCreateDialog(int id)
 	{
@@ -177,71 +180,91 @@ public class ContactGrid extends Activity
 		switch (realid)
 		{
 		case POPUP_OPTIONS_CONTACT:
-	      return new AlertDialog.Builder(this)
-		      .setTitle(getGridName(index))
-		      .setItems(R.array.list_popup_options_contact, new DialogInterface.OnClickListener()
+			return new AlertDialog.Builder(this).setTitle(getGridName(index)).setItems(R.array.list_popup_options_contact, new DialogInterface.OnClickListener()
+			{
+				public void onClick(DialogInterface dialog, int which)
 				{
-					public void onClick(DialogInterface dialog, int which)
+					switch (which)
 					{
-						switch(which)
-						{
-						case 0: HandleClickedItem(index, ACTION_SELECT); break;
-						case 1: HandleClickedItem(index, ACTION_REMOVE); break;
-						}
+					case 0:
+						HandleClickedItem(index, ACTION_SELECT);
+						break;
+					case 1:
+						HandleClickedItem(index, ACTION_REMOVE);
+						break;
 					}
-				})
-		     .create();
+				}
+			}).create();
 		case POPUP_OPTIONS_EMPTY:
-	      return new AlertDialog.Builder(this)
-		      .setTitle("Empty Space")
-		      .setItems(R.array.list_popup_options_empty, new DialogInterface.OnClickListener()
+			return new AlertDialog.Builder(this).setTitle("Empty Space").setItems(R.array.list_popup_options_empty, new DialogInterface.OnClickListener()
+			{
+				public void onClick(DialogInterface dialog, int which)
 				{
-					public void onClick(DialogInterface dialog, int which)
+					switch (which)
 					{
-						switch(which)
-						{
-						case 0: HandleClickedItem(index, ACTION_ADD); break;
-						}
+					case 0:
+						HandleClickedItem(index, ACTION_ADD);
+						break;
 					}
-				})
-		     .create();
+				}
+			}).create();
 		}
 		return null;
 	}
-	
+
 	/** Read the Preferences */
 	private void GetPreferences()
 	{
 		SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
 		_showmessages = settings.getBoolean("preference_messages", true);
-		
+
 		// I'm sure there's a better way to do this - http://stackoverflow.com/questions/3206765/number-preferences-in-preference-activity-in-android
 		String val = settings.getString("preference_numrows", "Four");
-		if (val.equalsIgnoreCase("one")) _numrows = 1;
-		else if (val.equalsIgnoreCase("two")) _numrows = 2;
-		else if (val.equalsIgnoreCase("three")) _numrows = 3;
-		else if (val.equalsIgnoreCase("four")) _numrows = 4;
-		else if (val.equalsIgnoreCase("five")) _numrows = 5;
-		else if (val.equalsIgnoreCase("six")) _numrows = 6;
-		else if (val.equalsIgnoreCase("seven")) _numrows = 7;
-		else if (val.equalsIgnoreCase("eight")) _numrows = 8;
-		else if (val.equalsIgnoreCase("nine")) _numrows = 9;
-		else if (val.equalsIgnoreCase("ten")) _numrows = 10;
-		
+		if (val.equalsIgnoreCase("one"))
+			_numrows = 1;
+		else if (val.equalsIgnoreCase("two"))
+			_numrows = 2;
+		else if (val.equalsIgnoreCase("three"))
+			_numrows = 3;
+		else if (val.equalsIgnoreCase("four"))
+			_numrows = 4;
+		else if (val.equalsIgnoreCase("five"))
+			_numrows = 5;
+		else if (val.equalsIgnoreCase("six"))
+			_numrows = 6;
+		else if (val.equalsIgnoreCase("seven"))
+			_numrows = 7;
+		else if (val.equalsIgnoreCase("eight"))
+			_numrows = 8;
+		else if (val.equalsIgnoreCase("nine"))
+			_numrows = 9;
+		else if (val.equalsIgnoreCase("ten"))
+			_numrows = 10;
+
 		val = settings.getString("preference_numcols", "Three");
-		if (val.equalsIgnoreCase("one")) _numcols = 1;
-		else if (val.equalsIgnoreCase("two")) _numcols = 2;
-		else if (val.equalsIgnoreCase("three")) _numcols = 3;
-		else if (val.equalsIgnoreCase("four")) _numcols = 4;
-		else if (val.equalsIgnoreCase("five")) _numcols = 5;
-		else if (val.equalsIgnoreCase("six")) _numcols = 6;
-		else if (val.equalsIgnoreCase("seven")) _numcols = 7;
-		else if (val.equalsIgnoreCase("eight")) _numcols = 8;
-		else if (val.equalsIgnoreCase("nine")) _numcols = 9;
-		else if (val.equalsIgnoreCase("ten")) _numcols = 10;
-		
+		if (val.equalsIgnoreCase("one"))
+			_numcols = 1;
+		else if (val.equalsIgnoreCase("two"))
+			_numcols = 2;
+		else if (val.equalsIgnoreCase("three"))
+			_numcols = 3;
+		else if (val.equalsIgnoreCase("four"))
+			_numcols = 4;
+		else if (val.equalsIgnoreCase("five"))
+			_numcols = 5;
+		else if (val.equalsIgnoreCase("six"))
+			_numcols = 6;
+		else if (val.equalsIgnoreCase("seven"))
+			_numcols = 7;
+		else if (val.equalsIgnoreCase("eight"))
+			_numcols = 8;
+		else if (val.equalsIgnoreCase("nine"))
+			_numcols = 9;
+		else if (val.equalsIgnoreCase("ten"))
+			_numcols = 10;
+
 		_numentries = _numrows * _numcols;
-		
+
 		// Recreate the saved keys array
 		long temp[] = new long[_numentries];
 		int keycnt = 0;
@@ -251,11 +274,12 @@ public class ContactGrid extends Activity
 			for (int x = 0; x < Math.min(keycnt, temp.length); x++)
 				temp[x] = _savedKeys[x];
 		}
-		for (int x = keycnt; x < temp.length; x++) // Fill the new spaces in the array with NO_CONTACT
+		for (int x = keycnt; x < temp.length; x++)
+			// Fill the new spaces in the array with NO_CONTACT
 			temp[x] = NO_CONTACT;
 		_savedKeys = temp;
 	}
-	
+
 	/** Launch the Preferences activity */
 	private void LaunchPreferences()
 	{
@@ -263,14 +287,14 @@ public class ContactGrid extends Activity
 		intent.setClass(this, ContactGridPreferences.class);
 		startActivityForResult(intent, CHANGE_PREFS * 100); // RequestCodes have to be multiplied by 100
 	}
-	
+
 	/** Launch the Android Contact Manager */
 	private void LaunchContacts()
 	{
 		Intent intent = new Intent(Intent.ACTION_DEFAULT, ContactsContract.Contacts.CONTENT_URI);
 		startActivity(intent);
 	}
-	
+
 	/** Deal with the selected item */
 	private void HandleClickedItem(int index, int action)
 	{
@@ -310,7 +334,7 @@ public class ContactGrid extends Activity
 		GridView grid = (GridView) findViewById(R.id.gridview);
 		grid.invalidateViews();
 	}
-	
+
 	/** Bring up a menu to valid options for the selected space */
 	private boolean HandleLongClickedItem(int index)
 	{
@@ -322,7 +346,7 @@ public class ContactGrid extends Activity
 		{
 			showDialog(POPUP_OPTIONS_EMPTY * 100 + index);
 		}
-		
+
 		return true;
 	}
 
