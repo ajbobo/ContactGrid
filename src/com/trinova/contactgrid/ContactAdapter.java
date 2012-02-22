@@ -46,9 +46,8 @@ public class ContactAdapter extends BaseAdapter
 		// Was the last view the right type?
 		if (convertView != null)
 		{
-			if ((convertView.findViewById(R.id.icon_badge) != null && gridtoinflate != R.layout.gridicon_quickcontact) ||
-				 (convertView.findViewById(R.id.icon_image) != null && gridtoinflate != R.layout.gridicon))
-				convertView = null; // Setting this to null forces the Inflater to regenerate the view
+			if (!convertView.getTag().equals(gridtoinflate))
+				convertView = null;
 		}
 
 		View v;
@@ -56,6 +55,7 @@ public class ContactAdapter extends BaseAdapter
 		{
 			LayoutInflater li = context.getLayoutInflater();
 			v = li.inflate(gridtoinflate, null);
+			v.setTag(gridtoinflate); // Record which type of grid it is
 		}
 		else
 		{
