@@ -46,6 +46,7 @@ public class ContactGrid extends Activity
 	// Class variables
 	private long[] _savedKeys;
 	private boolean _showmessages;
+	private boolean _actionshortcuts;
 	private int _numrows;
 	private int _numcols;
 	private int _numentries;
@@ -217,6 +218,7 @@ public class ContactGrid extends Activity
 	{
 		SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
 		_showmessages = settings.getBoolean("preference_messages", true);
+		_actionshortcuts = settings.getBoolean("preference_actionshortcuts", true);
 
 		// I'm sure there's a better way to do this - http://stackoverflow.com/questions/3206765/number-preferences-in-preference-activity-in-android
 		String val = settings.getString("preference_numrows", "Four");
@@ -349,6 +351,8 @@ public class ContactGrid extends Activity
 
 		return true;
 	}
+	
+	//public boolean HandleLongClickByURI()
 
 	/** Sets the window's title based on the current mode */
 	private void setWindowTitle()
@@ -419,5 +423,10 @@ public class ContactGrid extends Activity
 	public int getNumEntries()
 	{
 		return _numentries;
+	}
+	
+	public boolean getUseActionShortcuts()
+	{
+		return _actionshortcuts;
 	}
 }

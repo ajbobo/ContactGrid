@@ -1,5 +1,6 @@
 package com.trinova.contactgrid;
 
+//import android.R;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.view.LayoutInflater;
@@ -7,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
+import android.widget.QuickContactBadge;
 import android.widget.TextView;
 
 public class ContactAdapter extends BaseAdapter
@@ -35,11 +37,25 @@ public class ContactAdapter extends BaseAdapter
 
 	public View getView(int position, View convertView, ViewGroup parent)
 	{
+		boolean useactionshortcuts = context.getUseActionShortcuts();
+		
+		int gridtoinflate = R.layout.gridicon;
+		if (context.hasContact(position) && useactionshortcuts)
+			gridtoinflate = R.layout.gridicon_quickcontact;
+		
+		// Was the last view the right type?
+		if (convertView != null)
+		{
+			if ((convertView.findViewById(R.id.icon_badge) != null && gridtoinflate != R.layout.gridicon_quickcontact) ||
+				 (convertView.findViewById(R.id.icon_image) != null && gridtoinflate != R.layout.gridicon))
+				convertView = null;
+		}
+
 		View v;
 		if (convertView == null) // if it's not recycled, initialize some attributes
 		{
 			LayoutInflater li = context.getLayoutInflater();
-			v = li.inflate(R.layout.gridicon, null);
+			v = li.inflate(gridtoinflate, null);
 		}
 		else
 		{
@@ -48,6 +64,7 @@ public class ContactAdapter extends BaseAdapter
 
 		TextView tv = (TextView) v.findViewById(R.id.icon_text);
 		ImageView iv = (ImageView) v.findViewById(R.id.icon_image);
+		QuickContactBadge qcb = (QuickContactBadge) v.findViewById(R.id.icon_badge);
 		if (!context.hasContact(position)) // Nothing assigned
 		{
 			tv.setText("");
@@ -55,8 +72,20 @@ public class ContactAdapter extends BaseAdapter
 		}
 		else
 		{
-			Bitmap bitmap = context.getGridPhoto(position);
 			tv.setText(context.getGridName(position));
+			if (useactionshortcuts)
+			{
+				iv = qcb;
+				qcb.assignContactUri(context.getGridURI(position));
+				qcb.setOnLongClickListener(new View.OnLongClickListener()
+				{
+					public boolean onLongClick(View v)
+					{
+						return false; // Does nothing - passes the LongClick up the heirarchy
+					}
+				});
+			}
+			Bitmap bitmap = context.getGridPhoto(position);
 			if (bitmap != null)
 				iv.setImageBitmap(bitmap);
 			else

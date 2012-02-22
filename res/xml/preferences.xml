@@ -7,5 +7,6 @@
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/pref_category_behavior">
         <CheckBoxPreference android:key="preference_messages" android:title="@string/pref_showmessages" android:defaultValue="true"></CheckBoxPreference>
+        <CheckBoxPreference android:key="preference_actionshortcuts" android:title="@string/pref_actionshortcuts" android:defaultValue="true"/>
     </PreferenceCategory>
 </PreferenceScreen>
