@@ -173,6 +173,7 @@ public class ContactGrid extends Activity
 		}
 	}
 
+	/** Create a popup dialog */
 	@Override
 	public Dialog onCreateDialog(int id)
 	{
@@ -352,8 +353,6 @@ public class ContactGrid extends Activity
 		return true;
 	}
 	
-	//public boolean HandleLongClickByURI()
-
 	/** Sets the window's title based on the current mode */
 	private void setWindowTitle()
 	{
@@ -379,7 +378,7 @@ public class ContactGrid extends Activity
 		return true;
 	}
 
-	/** Returns the URI of the person in the specified grid */
+	/** Returns the URI of the person in the specified grid space */
 	public Uri getGridURI(int index)
 	{
 		if (!hasContact(index))
@@ -390,7 +389,7 @@ public class ContactGrid extends Activity
 		return griduri;
 	}
 
-	/** Returns the photo assigned to the specified grid */
+	/** Returns the photo assigned to the specified grid space */
 	public Bitmap getGridPhoto(int index)
 	{
 		Uri contacturi = getGridURI(index);
@@ -404,6 +403,7 @@ public class ContactGrid extends Activity
 		return BitmapFactory.decodeStream(stream);
 	}
 
+	/** Returns the name assigned to teh specified grid space */
 	public String getGridName(int index)
 	{
 		Uri contacturi = getGridURI(index);
@@ -420,11 +420,13 @@ public class ContactGrid extends Activity
 		return "<null>";
 	}
 
+	/** Returns the number of entries in the grid */
 	public int getNumEntries()
 	{
 		return _numentries;
 	}
 	
+	/** Returns whether or not Action Shortcuts should be used */
 	public boolean getUseActionShortcuts()
 	{
 		return _actionshortcuts;

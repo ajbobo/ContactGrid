@@ -48,7 +48,7 @@ public class ContactAdapter extends BaseAdapter
 		{
 			if ((convertView.findViewById(R.id.icon_badge) != null && gridtoinflate != R.layout.gridicon_quickcontact) ||
 				 (convertView.findViewById(R.id.icon_image) != null && gridtoinflate != R.layout.gridicon))
-				convertView = null;
+				convertView = null; // Setting this to null forces the Inflater to regenerate the view
 		}
 
 		View v;
@@ -75,7 +75,7 @@ public class ContactAdapter extends BaseAdapter
 			tv.setText(context.getGridName(position));
 			if (useactionshortcuts)
 			{
-				iv = qcb;
+				iv = qcb; // Bitmaps will be assigned to the QuickContactBadge
 				qcb.assignContactUri(context.getGridURI(position));
 				qcb.setOnLongClickListener(new View.OnLongClickListener()
 				{
