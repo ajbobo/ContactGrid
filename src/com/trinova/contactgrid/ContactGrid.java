@@ -172,13 +172,27 @@ public class ContactGrid extends Activity
 			break;
 		}
 	}
+	
+	/** Update the title of a Dialog because onCreateDialog() is only called once */
+	@Override
+	protected void onPrepareDialog(int id, Dialog dialog)
+	{
+		int realid = id / 100;
+		int index = id % 100;
+		switch (realid)
+		{
+		case POPUP_OPTIONS_CONTACT:
+			dialog.setTitle(getGridName(index)); // The title needs to be updated because the person in the grid space may have been changed
+			break;
+		}
+	}
 
 	/** Create a popup dialog */
 	@Override
 	public Dialog onCreateDialog(int id)
 	{
 		int realid = id / 100;
-		final int index = id % 100; // This has to be final so that the internal objects I'm able to declare can see it
+		final int index = id % 100; // This has to be final so that the internal objects I'm about to declare can see it
 		switch (realid)
 		{
 		case POPUP_OPTIONS_CONTACT:
