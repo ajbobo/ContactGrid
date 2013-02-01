@@ -37,6 +37,7 @@ public class ContactGrid extends Activity
 	private static final int ACTION_SELECT = 1;
 	private static final int ACTION_ADD = 2;
 	private static final int ACTION_REMOVE = 3;
+	private static final int ACTION_ADD_GROUP = 4;
 
 	private static final int PICK_CONTACT = 1;
 	private static final int CHANGE_PREFS = 2;
@@ -69,8 +70,8 @@ public class ContactGrid extends Activity
 
 		// Initialize the grid
 		GridView grid = (GridView) findViewById(R.id.gridview);
-		grid.setAdapter(new ContactAdapter(this));
 		grid.setNumColumns(_numcols);
+		grid.setAdapter(new ContactAdapter(this));
 
 		grid.setOnItemClickListener(new OnItemClickListener()
 		{
@@ -221,6 +222,9 @@ public class ContactGrid extends Activity
 					case 0:
 						HandleClickedItem(index, ACTION_ADD);
 						break;
+					case 1:
+						HandleClickedItem(index, ACTION_ADD_GROUP);
+						break;
 					}
 				}
 			}).create();
@@ -333,9 +337,23 @@ public class ContactGrid extends Activity
 		{
 			if (!hasContact(index))
 			{
-				// Opens a Contact list so that the user can select a Contant to add to the Grid
+				// Opens a Contact list so that the user can select a Contact to add to the Grid
 				Intent intent = new Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI);
 				startActivityForResult(intent, PICK_CONTACT * 100 + index); // Merge the request code and the index into a single value
+			}
+			else if (_showmessages)
+			{
+				showToast("That space is already taken");
+			}
+		}
+		else if (action == ACTION_ADD_GROUP)
+		{
+			if (!hasContact(index))
+			{
+				// Opens a Contact list so that the user can select a Contact to add to the Grid
+				//Intent intent = new Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI);
+				//startActivityForResult(intent, PICK_CONTACT * 100 + index); // Merge the request code and the index into a single value
+				showToast("Coming soon...");
 			}
 			else if (_showmessages)
 			{
@@ -417,7 +435,7 @@ public class ContactGrid extends Activity
 		return BitmapFactory.decodeStream(stream);
 	}
 
-	/** Returns the name assigned to teh specified grid space */
+	/** Returns the name assigned to the specified grid space */
 	public String getGridName(int index)
 	{
 		Uri contacturi = getGridURI(index);
@@ -438,6 +456,12 @@ public class ContactGrid extends Activity
 	public int getNumEntries()
 	{
 		return _numentries;
+	}
+	
+	/** Returns the number of columns in the grid */
+	public int getNumColumns()
+	{
+		return _numcols;
 	}
 	
 	/** Returns whether or not Action Shortcuts should be used */

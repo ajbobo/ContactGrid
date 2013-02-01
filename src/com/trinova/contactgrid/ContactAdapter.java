@@ -38,6 +38,7 @@ public class ContactAdapter extends BaseAdapter
 	public View getView(int position, View convertView, ViewGroup parent)
 	{
 		boolean useactionshortcuts = context.getUseActionShortcuts();
+		int imagesize = (int)(parent.getMeasuredWidth() / context.getNumColumns() * .9);
 		
 		int gridtoinflate = R.layout.gridicon;
 		if (context.hasContact(position) && useactionshortcuts)
@@ -91,6 +92,8 @@ public class ContactAdapter extends BaseAdapter
 			else
 				iv.setImageResource(R.drawable.android);
 		}
+		iv.getLayoutParams().width = imagesize;
+		iv.getLayoutParams().height = imagesize;
 		return v;
 	}
 }
