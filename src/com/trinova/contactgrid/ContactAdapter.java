@@ -82,7 +82,7 @@ public class ContactAdapter extends BaseAdapter
 				{
 					public boolean onLongClick(View v)
 					{
-						return false; // Does nothing - passes the LongClick up the heirarchy
+						return false; // Does nothing - passes the LongClick up the hierarchy
 					}
 				});
 			}
