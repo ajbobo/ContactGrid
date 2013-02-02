@@ -353,7 +353,9 @@ public class ContactGrid extends Activity
 				// Opens a Contact list so that the user can select a Contact to add to the Grid
 				//Intent intent = new Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI);
 				//startActivityForResult(intent, PICK_CONTACT * 100 + index); // Merge the request code and the index into a single value
-				showToast("Coming soon...");
+				//showToast("Coming soon...");
+				Intent intent = new Intent(null, GroupList.class);
+				startActivity(intent);
 			}
 			else if (_showmessages)
 			{
