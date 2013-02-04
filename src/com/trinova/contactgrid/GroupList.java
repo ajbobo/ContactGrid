@@ -17,15 +17,16 @@ public class GroupList extends Activity
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.grouplistlayout);
 		
-		// Get all of the Groups and put them into the listview
+		// Get all of the Groups and information about each
 		String[] projection = { ContactsContract.Groups._ID, ContactsContract.Groups.TITLE, ContactsContract.Groups.SUMMARY_COUNT };
-		String[] visiblecolumns = { ContactsContract.Groups._ID, ContactsContract.Groups.TITLE };
-		int[] idstofill = { R.id.txtGroupName };
-		
-		Cursor groupcursor = getContentResolver().query(ContactsContract.Groups.CONTENT_SUMMARY_URI, projection, null, null, "ASC");
-		SimpleCursorAdapter adapter = new SimpleCursorAdapter(getApplicationContext(), R.layout.grouplistentry, groupcursor, visiblecolumns, idstofill);
-		
+		String constraint = ContactsContract.Groups.SUMMARY_COUNT + " > 0";
+		Cursor groupcursor = getContentResolver().query(ContactsContract.Groups.CONTENT_SUMMARY_URI, projection, constraint, null, "");
+
+		// Put the requested Group data into the ListView
 		ListView list = (ListView)findViewById(R.id.lstGroups);
+		String[] visiblecolumns = { ContactsContract.Groups.TITLE, ContactsContract.Groups.SUMMARY_COUNT };
+		int[] idstofill = { R.id.txtGroupName, R.id.txtGroupCount };
+		SimpleCursorAdapter adapter = new SimpleCursorAdapter(getApplicationContext(), R.layout.grouplistentry, groupcursor, visiblecolumns, idstofill);
 		list.setAdapter(adapter);
 	}
 	

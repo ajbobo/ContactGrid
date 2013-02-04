@@ -350,11 +350,9 @@ public class ContactGrid extends Activity
 		{
 			if (!hasContact(index))
 			{
-				// Opens a Contact list so that the user can select a Contact to add to the Grid
-				//Intent intent = new Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI);
-				//startActivityForResult(intent, PICK_CONTACT * 100 + index); // Merge the request code and the index into a single value
-				//showToast("Coming soon...");
-				Intent intent = new Intent(null, GroupList.class);
+				// Opens a list of Groups (there isn't a standard one, so I had to write a custom one)
+				Intent intent = new Intent();
+				intent.setClass(this, GroupList.class);
 				startActivity(intent);
 			}
 			else if (_showmessages)
