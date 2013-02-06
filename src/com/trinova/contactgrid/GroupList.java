@@ -20,7 +20,7 @@ public class GroupList extends Activity
 		// Get all of the Groups and information about each
 		String[] projection = { ContactsContract.Groups._ID, ContactsContract.Groups.TITLE, ContactsContract.Groups.SUMMARY_COUNT };
 		String constraint = ContactsContract.Groups.SUMMARY_COUNT + " > 0";
-		Cursor groupcursor = getContentResolver().query(ContactsContract.Groups.CONTENT_SUMMARY_URI, projection, constraint, null, "");
+		Cursor groupcursor = managedQuery(ContactsContract.Groups.CONTENT_SUMMARY_URI, projection, constraint, null, "");
 
 		// Put the requested Group data into the ListView
 		ListView list = (ListView)findViewById(R.id.lstGroups);
