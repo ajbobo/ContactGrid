@@ -41,7 +41,7 @@ public class ContactAdapter extends BaseAdapter
 		int imagesize = (int)(parent.getMeasuredWidth() / context.getNumColumns() * .9);
 		
 		int gridtoinflate = R.layout.gridicon;
-		if (context.hasContact(position) && useactionshortcuts)
+		if (context.hasContact(position) && context.isIndexAContact(position) && useactionshortcuts)
 			gridtoinflate = R.layout.gridicon_quickcontact;
 		
 		// Was the last view the right type?
@@ -74,7 +74,7 @@ public class ContactAdapter extends BaseAdapter
 		else
 		{
 			tv.setText(context.getGridName(position));
-			if (useactionshortcuts)
+			if (useactionshortcuts && context.isIndexAContact(position))
 			{
 				iv = qcb; // Bitmaps will be assigned to the QuickContactBadge
 				qcb.assignContactUri(context.getGridURI(position));

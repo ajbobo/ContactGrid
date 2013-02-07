@@ -33,6 +33,7 @@ public class ContactGrid extends Activity
 
 	private static final int POPUP_OPTIONS_CONTACT = 1;
 	private static final int POPUP_OPTIONS_EMPTY = 2;
+	private static final int POPUP_OPTIONS_GROUP = 3;
 
 	private static final int ACTION_SELECT = 1;
 	private static final int ACTION_ADD = 2;
@@ -41,6 +42,7 @@ public class ContactGrid extends Activity
 
 	private static final int PICK_CONTACT = 1;
 	private static final int CHANGE_PREFS = 2;
+	private static final int PICK_GROUP = 3;
 
 	private static final long NO_CONTACT = -1;
 
@@ -163,6 +165,20 @@ public class ContactGrid extends Activity
 			// Refresh the grid
 			grid.invalidateViews();
 			break;
+		case PICK_GROUP:
+			if (resultCode == Activity.RESULT_OK)
+			{
+				Uri groupdata = data.getData();
+				Cursor c = managedQuery(groupdata, null, null, null, null);
+				if (c.moveToFirst())
+				{
+					long key = c.getLong(c.getColumnIndexOrThrow(ContactsContract.Groups._ID));
+					_savedKeys[index] = -key - 1; // Group id's are stored as negative numbers
+				}
+			}
+			
+			grid.invalidateViews();
+			break;
 		case CHANGE_PREFS:
 			// Update the preferences
 			GetPreferences();
@@ -183,6 +199,7 @@ public class ContactGrid extends Activity
 		switch (realid)
 		{
 		case POPUP_OPTIONS_CONTACT:
+		case POPUP_OPTIONS_GROUP:
 			dialog.setTitle(getGridName(index)); // The title needs to be updated because the person in the grid space may have been changed
 			break;
 		}
@@ -212,6 +229,26 @@ public class ContactGrid extends Activity
 					}
 				}
 			}).create();
+		case POPUP_OPTIONS_GROUP:
+			AlertDialog.Builder dialog = new AlertDialog.Builder(this).setTitle(getGridName(index));
+			// Check to see if the device can handle SMS - FINISH ME
+			DialogInterface.OnClickListener listener = new DialogInterface.OnClickListener()
+			{
+				public void onClick(DialogInterface dialog, int which)
+				{
+					switch (which)
+					{
+						case 0: // Send email
+							showToast("Sending email");
+							break;
+						case 1: // Send SMS
+							showToast("Sending SMS");
+							break;
+					}
+				}
+			};
+			dialog.setItems(R.array.list_popup_options_group_email_only, listener);
+			return dialog.create();
 		case POPUP_OPTIONS_EMPTY:
 			return new AlertDialog.Builder(this).setTitle("Empty Space").setItems(R.array.list_popup_options_empty, new DialogInterface.OnClickListener()
 			{
@@ -324,9 +361,16 @@ public class ContactGrid extends Activity
 		{
 			if (hasContact(index))
 			{
-				Uri lookupuri = getGridURI(index);
-				Intent intent = new Intent(Intent.ACTION_VIEW, lookupuri);
-				startActivity(intent);
+				if (_savedKeys[index] >= 0)
+				{
+					Uri lookupuri = getGridURI(index);
+					Intent intent = new Intent(Intent.ACTION_VIEW, lookupuri);
+					startActivity(intent);
+				}
+				else
+				{
+					showDialog(POPUP_OPTIONS_GROUP * 100 + index);
+				}
 			}
 			else if (_showmessages)
 			{
@@ -353,7 +397,7 @@ public class ContactGrid extends Activity
 				// Opens a list of Groups (there isn't a standard one, so I had to write a custom one)
 				Intent intent = new Intent();
 				intent.setClass(this, GroupList.class);
-				startActivity(intent);
+				startActivityForResult(intent, PICK_GROUP * 100 + index); // Merge the request code and the index into a single value
 			}
 			else if (_showmessages)
 			{
@@ -416,8 +460,11 @@ public class ContactGrid extends Activity
 		if (!hasContact(index))
 			return null;
 
-		Uri griduri = ContentUris.withAppendedId(ContactsContract.Contacts.CONTENT_URI, _savedKeys[index]);
-
+		Uri griduri;
+		if (_savedKeys[index] >= 0)
+			griduri = ContentUris.withAppendedId(ContactsContract.Contacts.CONTENT_URI, _savedKeys[index]);
+		else
+			griduri = ContentUris.withAppendedId(ContactsContract.Groups.CONTENT_URI, getGroupID(index));
 		return griduri;
 	}
 
@@ -425,7 +472,7 @@ public class ContactGrid extends Activity
 	public Bitmap getGridPhoto(int index)
 	{
 		Uri contacturi = getGridURI(index);
-		if (contacturi == null)
+		if (contacturi == null || _savedKeys[index] < 0)
 			return null;
 
 		InputStream stream = ContactsContract.Contacts.openContactPhotoInputStream(getContentResolver(), contacturi);
@@ -445,11 +492,23 @@ public class ContactGrid extends Activity
 		Cursor c = managedQuery(contacturi, null, null, null, null);
 		if (c.moveToFirst())
 		{
-			String name = c.getString(c.getColumnIndexOrThrow(ContactsContract.Contacts.DISPLAY_NAME));
+			String column;
+			if (_savedKeys[index] >= 0)
+				column = ContactsContract.Contacts.DISPLAY_NAME;
+			else
+				column = ContactsContract.Groups.TITLE;
+			String name = c.getString(c.getColumnIndexOrThrow(column));
 			return name;
 		}
 
 		return "<null>";
+	}
+	
+	/** Converts the stored index for a group into a usable id */
+	private long getGroupID(int index)
+	{
+		// ID 1 is saved as -2, 2 is -3, etc. (so NO_CONTACT still works)
+		return -1 * (_savedKeys[index] + 1);
 	}
 
 	/** Returns the number of entries in the grid */
@@ -468,5 +527,14 @@ public class ContactGrid extends Activity
 	public boolean getUseActionShortcuts()
 	{
 		return _actionshortcuts;
+	}
+	
+	/** Return whether or not the index is a contact (not a group) */
+	public boolean isIndexAContact(int index)
+	{
+		if (_savedKeys[index] < 0)
+			return false;
+			
+		return true;
 	}
 }
