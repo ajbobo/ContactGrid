@@ -1,6 +1,7 @@
 package com.trinova.contactgrid;
 
 import java.io.InputStream;
+import java.util.List;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -9,6 +10,8 @@ import android.content.ContentUris;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -53,6 +56,7 @@ public class ContactGrid extends Activity
 	private int _numrows;
 	private int _numcols;
 	private int _numentries;
+	private boolean _smsavailable;
 
 	/** Called when the activity is first created. */
 	@Override
@@ -60,10 +64,19 @@ public class ContactGrid extends Activity
 	{
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
+		
+		// One-time initialization
+		// Is SMS Available on this device?
+		Intent intent = new Intent(Intent.ACTION_VIEW);
+		intent.setType("vnd.android-dir/mms-sms");
+		PackageManager packageManager = getPackageManager();
+		List<ResolveInfo> activities = packageManager.queryIntentActivities(intent, 0);
+		_smsavailable = activities.size() > 0;
 
-		// Initialize class variables
+		// Initialize preference variables
 		GetPreferences();
 
+		// Initialize the grid with saved preferences
 		SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
 		for (int x = 0; x < _numentries; x++)
 		{
@@ -231,23 +244,27 @@ public class ContactGrid extends Activity
 			}).create();
 		case POPUP_OPTIONS_GROUP:
 			AlertDialog.Builder dialog = new AlertDialog.Builder(this).setTitle(getGridName(index));
-			// Check to see if the device can handle SMS - FINISH ME
+			// This Listener is used for both cases (SMS or not)
 			DialogInterface.OnClickListener listener = new DialogInterface.OnClickListener()
 			{
 				public void onClick(DialogInterface dialog, int which)
 				{
+					long groupid = getGroupID(index);
 					switch (which)
 					{
 						case 0: // Send email
-							showToast("Sending email");
+							EmailGroup(groupid);
 							break;
 						case 1: // Send SMS
-							showToast("Sending SMS");
+							SMSGroup(groupid);
 							break;
 					}
 				}
 			};
-			dialog.setItems(R.array.list_popup_options_group_email_only, listener);
+			if (_smsavailable)
+				dialog.setItems(R.array.list_popup_options_group_email_sms, listener);
+			else
+				dialog.setItems(R.array.list_popup_options_group_email_only, listener);
 			return dialog.create();
 		case POPUP_OPTIONS_EMPTY:
 			return new AlertDialog.Builder(this).setTitle("Empty Space").setItems(R.array.list_popup_options_empty, new DialogInterface.OnClickListener()
@@ -413,7 +430,19 @@ public class ContactGrid extends Activity
 		GridView grid = (GridView) findViewById(R.id.gridview);
 		grid.invalidateViews();
 	}
+	
+	/** Start an email to all members of the group */
+	private void EmailGroup(long groupid)
+	{
+		showToast("Send email to group " + groupid);
+	}
 
+	/** Start an SMS test message to all members of the group */
+	private void SMSGroup(long groupid)
+	{
+		showToast("Send SMS to group " + groupid);
+	}
+	
 	/** Bring up a menu to valid options for the selected space */
 	private boolean HandleLongClickedItem(int index)
 	{

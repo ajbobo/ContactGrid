@@ -11,6 +11,11 @@
 	<string-array name="list_popup_options_group_email_only">
 		<item >Send email to Group</item>
 	</string-array>
+	<string-array name="list_popup_options_group_email_sms">
+		<item >Send email to Group</item>
+		<item>Send SMS to Group</item>
+	</string-array>
+	
 
     
 </resources>
