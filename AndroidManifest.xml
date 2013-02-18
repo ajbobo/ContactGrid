@@ -17,6 +17,7 @@
         </activity>
         <activity android:name="ContactGridPreferences"></activity>
         <activity android:name="GroupList"></activity>
+		<activity android:name="GroupActions"></activity>
 
     </application>
 

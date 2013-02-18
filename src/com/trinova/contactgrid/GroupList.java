@@ -5,7 +5,7 @@ import android.content.ContentUris;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.provider.ContactsContract;
+import android.provider.ContactsContract.Groups;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
@@ -25,13 +25,13 @@ public class GroupList extends Activity
 		setContentView(R.layout.grouplistlayout);
 		
 		// Get all of the Groups and information about each
-		String[] projection = { ContactsContract.Groups._ID, ContactsContract.Groups.TITLE, ContactsContract.Groups.SUMMARY_COUNT };
-		String constraint = ContactsContract.Groups.SUMMARY_COUNT + " > 0";
-		_groupcursor = managedQuery(ContactsContract.Groups.CONTENT_SUMMARY_URI, projection, constraint, null, "");
+		String[] projection = { Groups._ID, Groups.TITLE, Groups.SUMMARY_COUNT };
+		String constraint = Groups.SUMMARY_COUNT + " > 0";
+		_groupcursor = managedQuery(Groups.CONTENT_SUMMARY_URI, projection, constraint, null, "");
 
 		// Put the requested Group data into the ListView
 		ListView list = (ListView)findViewById(R.id.lstGroups);
-		String[] visiblecolumns = { ContactsContract.Groups.TITLE, ContactsContract.Groups.SUMMARY_COUNT };
+		String[] visiblecolumns = { Groups.TITLE, Groups.SUMMARY_COUNT };
 		int[] idstofill = { R.id.txtGroupName, R.id.txtGroupCount };
 		SimpleCursorAdapter adapter = new SimpleCursorAdapter(getApplicationContext(), R.layout.grouplistentry, _groupcursor, visiblecolumns, idstofill);
 		list.setAdapter(adapter);
@@ -47,10 +47,10 @@ public class GroupList extends Activity
 	private void HandleClick(int position)
 	{
 		_groupcursor.moveToPosition(position);
-		int id = _groupcursor.getInt(0);
+		int id = _groupcursor.getInt(_groupcursor.getColumnIndex(Groups._ID));
 		
 		Intent data = new Intent();
-		data.setData(ContentUris.withAppendedId(ContactsContract.Groups.CONTENT_URI, id));
+		data.setData(ContentUris.withAppendedId(Groups.CONTENT_URI, id));
 		setResult(Activity.RESULT_OK, data); // Return the Group's ID to the calling activity
 		finish();
 	}
