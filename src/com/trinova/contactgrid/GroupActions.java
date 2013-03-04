@@ -9,6 +9,7 @@ import android.os.*;
 import android.provider.ContactsContract.*;
 import android.provider.ContactsContract.CommonDataKinds.*;
 import android.widget.*;
+import android.view.*;
 import java.util.*;
 
 public class GroupActions extends Activity
@@ -22,8 +23,21 @@ public class GroupActions extends Activity
 	{
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.groupactionlayout);
-
+		
 		checkForSMS();
+		
+		Button btn =(Button)findViewById(R.id.btnEmailGroup);
+		btn.setOnClickListener(new View.OnClickListener()
+		{
+			public void onClick(View v) { EmailGroup(); }
+		});
+		
+		btn = (Button)findViewById(R.id.btnTextGroup);
+		btn.setOnClickListener(new View.OnClickListener()
+		{
+			public void onClick(View v) { TextGroup(); }
+		});
+		btn.setEnabled(_smsavailable);
 
 		Intent intent = this.getIntent();
 		long groupid = intent.getLongExtra("GroupID", 0);
@@ -89,6 +103,16 @@ public class GroupActions extends Activity
 		PackageManager packageManager = getPackageManager();
 		List<ResolveInfo> activities = packageManager.queryIntentActivities(intent, 0);
 		_smsavailable = activities.size() > 0;
+	}
+	
+	private void EmailGroup()
+	{
+		Toast.makeText(this, "Emailing Group", Toast.LENGTH_SHORT).show();
+	}
+	
+	private void TextGroup()
+	{
+		Toast.makeText(this, "Texting Group", Toast.LENGTH_SHORT).show();
 	}
 	
 	private class SimpleContact

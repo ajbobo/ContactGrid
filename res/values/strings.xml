@@ -9,4 +9,6 @@
     <string name="pref_actionshortcuts">Use Action Shortcuts</string>
     <string name="label_selectgroup">Select a Group</string>
 	<string name="label_groupmembers">Group members</string>
+	<string name="btnEmailGroup">Email Group</string>
+	<string name="btnTextGroup">Text Group</string>
 </resources>
