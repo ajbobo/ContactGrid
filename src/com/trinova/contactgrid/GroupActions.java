@@ -107,12 +107,31 @@ public class GroupActions extends Activity
 	
 	private void EmailGroup()
 	{
-		Toast.makeText(this, "Emailing Group", Toast.LENGTH_SHORT).show();
+		String[] addresses = new String[_groupmembers.length];
+		for (int x = 0; x < _groupmembers.length; x++)
+			addresses[x] = _groupmembers[x].getEmail();
+		Intent intent = new Intent(Intent.ACTION_SEND);
+		intent.setType("plain/text");
+		intent.putExtra(Intent.EXTRA_EMAIL, addresses);
+		startActivity(intent);
 	}
 	
 	private void TextGroup()
 	{
-		Toast.makeText(this, "Texting Group", Toast.LENGTH_SHORT).show();
+		String numbers = "smsto:";
+		for (int x = 0; x < _groupmembers.length; x++)
+		{
+			if (_groupmembers[x].getCellphone().length() == 0)
+				continue;
+				
+			if (x > 0) numbers += ","; // This may need to be a ; for some phones
+			numbers += _groupmembers[x].getCellphone();
+		}
+		
+		//Toast.makeText(this, numbers,Toast.LENGTH_SHORT).show();
+		
+		Intent intent = new Intent(Intent.ACTION_SENDTO, Uri.parse(numbers));
+		startActivity(intent);
 	}
 	
 	private class SimpleContact
