@@ -18,14 +18,16 @@
 			<Button
 				android:text="@string/btnEmailGroup"
 				android:id="@+id/btnEmailGroup"
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"/>
+				android:layout_width="0dp"
+				android:layout_height="wrap_content"
+				android:layout_weight="1"/>
 				
 			<Button
 				android:text="@string/btnTextGroup"
 				android:id="@+id/btnTextGroup"
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"/>
+				android:layout_width="0dp"
+				android:layout_height="wrap_content"
+				android:layout_weight="1"/>
 				
 	</LinearLayout>
 	
