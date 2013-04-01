@@ -199,6 +199,7 @@ public class GroupActions extends Activity
 	{
 		Uri uri = ContentUris.withAppendedId(Contacts.CONTENT_URI, contact.getID());
 		Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+		intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS | Intent.FLAG_ACTIVITY_NO_HISTORY);
 		startActivity(intent);
 	}
 	
