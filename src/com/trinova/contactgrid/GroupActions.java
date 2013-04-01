@@ -38,6 +38,12 @@ public class GroupActions extends Activity
 			public void onClick(View v) { TextGroup(); }
 		});
 		btn.setEnabled(_smsavailable);
+		
+		btn = (Button)findViewById(R.id.btnSelectAll);
+		btn.setOnClickListener(new View.OnClickListener()
+		{
+			public void onClick(View v) { SelectAll((CheckBox)v); }
+		});
 
 		Intent intent = this.getIntent();
 		long groupid = intent.getLongExtra("GroupID", 0);
@@ -63,7 +69,9 @@ public class GroupActions extends Activity
 				{
 					_groupmembers[x] = new SimpleContact();
 					_groupmembers[x].setDisplayName(membercursor.getString(membercursor.getColumnIndex(Contacts.DISPLAY_NAME)));
+					_groupmembers[x].setID(memberid);
 				
+					// Find the contact's first listed cell phone number
 					projection = new String [] {Phone.CONTACT_ID, Phone.NUMBER, Phone.TYPE };
 					constraint = Phone.CONTACT_ID + "=" + memberid + " AND " +
 					             Phone.TYPE + "=" + Phone.TYPE_MOBILE + " AND " +
@@ -75,6 +83,7 @@ public class GroupActions extends Activity
 					}
 					cursor.close();
 					
+					// Find the contact's first listed email address
 					projection = new String [] {Email.CONTACT_ID, Email.DATA1 }; // Data1 = Address - for some reason Eclipse won't recognize Email.Address
 					constraint = Email.CONTACT_ID + "=" + memberid + " AND " +
 					             Email.MIMETYPE + "='" + Email.CONTENT_ITEM_TYPE +"'";
@@ -90,11 +99,11 @@ public class GroupActions extends Activity
 
 			// Put the names in the list
 			ListView list = (ListView)findViewById(R.id.lstGroupMembers);
-			ArrayAdapter<SimpleContact> adapter = new ArrayAdapter<SimpleContact>(this, R.layout.groupactionentry, R.id.txtGroupMemberName, _groupmembers);
-			list.setAdapter(adapter);
+			list.setAdapter(new SimpleContactAdapter(this));
 		}
 	}
 
+	/** Check to see if the device can handle SMS */
 	private void checkForSMS()
 	{
 		// Is SMS Available on this device?
@@ -105,40 +114,103 @@ public class GroupActions extends Activity
 		_smsavailable = activities.size() > 0;
 	}
 	
+	/** Mark all members as selected or not */
+	private void SelectAll(CheckBox box)
+	{
+		boolean checked = box.isChecked();
+		ListView list = (ListView)findViewById(R.id.lstGroupMembers);
+		int cnt = list.getChildCount();
+		for (int x = 0; x < cnt; x++)
+		{
+			View v = list.getChildAt(x);
+			CheckBox memberbox = (CheckBox)v.findViewById(R.id.btnCheckMember);
+			memberbox.setChecked(checked);
+			_groupmembers[x].setChecked(checked);
+		}
+	}
+	
+	/** Compose an email to all selected members */
 	private void EmailGroup()
 	{
 		String[] addresses = new String[_groupmembers.length];
 		for (int x = 0; x < _groupmembers.length; x++)
+		{
+			if (!_groupmembers[x].getChecked())
+				continue;
 			addresses[x] = _groupmembers[x].getEmail();
+		}
 		Intent intent = new Intent(Intent.ACTION_SEND);
 		intent.setType("plain/text");
 		intent.putExtra(Intent.EXTRA_EMAIL, addresses);
 		startActivity(intent);
 	}
 	
+	/** Compose a text to all selected members */
 	private void TextGroup()
 	{
 		String numbers = "smsto:";
 		for (int x = 0; x < _groupmembers.length; x++)
 		{
+			if (!_groupmembers[x].getChecked())
+				continue;
 			if (_groupmembers[x].getCellphone().length() == 0)
 				continue;
 				
 			if (x > 0) numbers += ","; // This may need to be a ; for some phones
 			numbers += _groupmembers[x].getCellphone();
 		}
-		
-		//Toast.makeText(this, numbers,Toast.LENGTH_SHORT).show();
-		
+	
 		Intent intent = new Intent(Intent.ACTION_SENDTO, Uri.parse(numbers));
 		startActivity(intent);
 	}
 	
+	/** Mark or unmark a member as selected */
+	private void CheckMember(SimpleContact contact, CheckBox box)
+	{
+		CheckBox btn = (CheckBox)findViewById(R.id.btnSelectAll);
+		btn.setChecked(false);
+		
+		contact.setChecked(box.isChecked());
+	}
+	
+	/** Compose an email to a single member */
+	private void EmailMember(SimpleContact contact)
+	{
+		String[] addresses = new String[1];
+		addresses[0] = contact.getEmail();
+		
+		Intent intent = new Intent(Intent.ACTION_SEND);
+		intent.setType("plain/text");
+		intent.putExtra(Intent.EXTRA_EMAIL, addresses);
+		startActivity(intent);
+	}
+	
+	/** Compose a text to a single member */
+	private void TextMember(SimpleContact contact)
+	{
+		String number = "smsto:" + contact.getCellphone();
+	
+		Intent intent = new Intent(Intent.ACTION_SENDTO, Uri.parse(number));
+		startActivity(intent);
+	}
+	
+	/** Show the device's information for a single member */
+	private void DisplayMember(SimpleContact contact)
+	{
+		Uri uri = ContentUris.withAppendedId(Contacts.CONTENT_URI, contact.getID());
+		Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+		startActivity(intent);
+	}
+	
+	/** A class to hold basic information about a single contact.
+	    Easier to use this than to look up this information constantly. */
 	private class SimpleContact
 	{
 		private String _displayname = "";
 		private String _email = "";
 		private String _cellphone = "";
+		private boolean _checked = false;
+		private long _id = -1;
 
 		public void setCellphone(String cellphone)
 		{
@@ -170,10 +242,99 @@ public class GroupActions extends Activity
 			return _displayname;
 		}
 		
+		public boolean getChecked()
+		{
+			return _checked;
+		}
+		
+		public void setChecked(boolean value)
+		{
+			_checked = value;
+		}
+		
+		public long getID()
+		{
+			return _id;
+		}
+		
+		public void setID(long id)
+		{
+			_id = id;
+		}
+		
 		@Override
 		public String toString()
 		{
-			return _displayname + " | " + _cellphone + " | " + _email;
+			return _displayname;
+		}
+	}
+	
+	/** An Adapter to show group members and assign functionality to the views used */
+	private class SimpleContactAdapter extends BaseAdapter
+	{
+		private GroupActions context;
+
+		public SimpleContactAdapter(Context c)
+		{
+			context = (GroupActions) c;
+		}
+
+		public int getCount()
+		{
+			return context._groupmembers.length;
+		}
+
+		public Object getItem(int arg0)
+		{
+			return null;
+		}
+
+		public long getItemId(int arg0)
+		{
+			return 0;
+		}
+
+		public View getView(int position, View convertView, ViewGroup parent)
+		{
+			int entrytoinflate = R.layout.groupactionentry;
+
+			View v;
+			if (convertView == null) // if it's not recycled, initialize some attributes
+			{
+				LayoutInflater li = context.getLayoutInflater();
+				v = li.inflate(entrytoinflate, null);
+			}
+			else
+			{
+				v = convertView;
+			}
+
+			final SimpleContact contact = context._groupmembers[position];
+			TextView tv = (TextView) v.findViewById(R.id.txtGroupMemberName);
+			tv.setText(contact.getDisplayName());
+			tv.setOnClickListener(new View.OnClickListener()
+			{
+				public void onClick(View v) { context.DisplayMember(contact); }
+			});
+			
+			Button btn = (Button) v.findViewById(R.id.btnTextMember);
+			btn.setEnabled(contact.getCellphone().length() > 0 & context._smsavailable);
+			btn.setOnClickListener(new View.OnClickListener() {
+				public void onClick(View v) { context.TextMember(contact); }
+			});
+			
+			btn = (Button) v.findViewById(R.id.btnEmailMember);
+			btn.setEnabled(contact.getEmail().length() > 0);
+			btn.setOnClickListener(new View.OnClickListener() {
+				public void onClick(View v) { context.EmailMember(contact); }
+			});
+			
+			btn = (Button) v.findViewById(R.id.btnCheckMember);
+			btn.setOnClickListener(new View.OnClickListener() {
+				public void onClick(View v) { context.CheckMember(contact, (CheckBox)v); }
+			});
+			
+			return v;
 		}
 	}
 }

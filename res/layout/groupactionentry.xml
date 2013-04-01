@@ -2,14 +2,36 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:padding="12dp"
     android:orientation="horizontal" >
+	
+	<CheckBox
+		android:id="@+id/btnCheckMember"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:paddingRight="5dp"
+		android:paddingLeft="0dp"
+		android:layout_alignParentLeft="true"/>
+
+	<Button
+		android:id="@+id/btnTextMember"
+		android:text="Text"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_alignParentRight="true"/>
+		
+	<Button
+		android:id="@+id/btnEmailMember"
+		android:text="Email"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_toLeftOf="@id/btnTextMember"/>
 
     <TextView
         android:id="@+id/txtGroupMemberName"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:textAppearance="?android:attr/textAppearanceLarge" />
+        android:layout_height="fill_parent"
+		android:layout_centerVertical="true"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+		android:layout_toRightOf="@id/btnCheckMember"/>
 
 </RelativeLayout>
