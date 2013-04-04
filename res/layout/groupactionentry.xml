@@ -13,16 +13,20 @@
 		android:layout_alignParentLeft="true"
 		android:layout_centerVertical="true"/>
 
-	<Button
+	<ImageButton
 		android:id="@+id/btnTextMember"
-		android:text="Text"
+		android:contentDescription="Text"
+		android:src="@drawable/sym_action_email"
+		style="?android:attr/buttonBarButtonStyle"
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
 		android:layout_alignParentRight="true"/>
 		
-	<Button
+	<ImageButton
 		android:id="@+id/btnEmailMember"
-		android:text="Email"
+		android:contentDescription="Email"
+		android:src="@drawable/sym_action_email"
+		style="?android:attr/buttonBarButtonStyle"
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
 		android:layout_toLeftOf="@id/btnTextMember"/>

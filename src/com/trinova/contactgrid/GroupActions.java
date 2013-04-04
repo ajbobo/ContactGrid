@@ -26,20 +26,20 @@ public class GroupActions extends Activity
 		
 		checkForSMS();
 		
-		Button btn =(Button)findViewById(R.id.btnEmailGroup);
-		btn.setOnClickListener(new View.OnClickListener()
+		ImageButton ibtn =(ImageButton)findViewById(R.id.btnEmailGroup);
+		ibtn.setOnClickListener(new View.OnClickListener()
 		{
 			public void onClick(View v) { EmailGroup(); }
 		});
 		
-		btn = (Button)findViewById(R.id.btnTextGroup);
-		btn.setOnClickListener(new View.OnClickListener()
+		ibtn = (ImageButton)findViewById(R.id.btnTextGroup);
+		ibtn.setOnClickListener(new View.OnClickListener()
 		{
 			public void onClick(View v) { TextGroup(); }
 		});
-		btn.setEnabled(_smsavailable);
+		ibtn.setEnabled(_smsavailable);
 		
-		btn = (Button)findViewById(R.id.btnSelectAll);
+		Button btn = (Button)findViewById(R.id.btnSelectAll);
 		btn.setOnClickListener(new View.OnClickListener()
 		{
 			public void onClick(View v) { SelectAll((CheckBox)v); }
@@ -318,19 +318,19 @@ public class GroupActions extends Activity
 				public void onClick(View v) { context.DisplayMember(contact); }
 			});
 			
-			Button btn = (Button) v.findViewById(R.id.btnTextMember);
-			btn.setEnabled(contact.getCellphone().length() > 0 & context._smsavailable);
-			btn.setOnClickListener(new View.OnClickListener() {
+			ImageButton ibtn = (ImageButton) v.findViewById(R.id.btnTextMember);
+			ibtn.setEnabled(contact.getCellphone().length() > 0 & context._smsavailable);
+			ibtn.setOnClickListener(new View.OnClickListener() {
 				public void onClick(View v) { context.TextMember(contact); }
 			});
 			
-			btn = (Button) v.findViewById(R.id.btnEmailMember);
-			btn.setEnabled(contact.getEmail().length() > 0);
-			btn.setOnClickListener(new View.OnClickListener() {
+			ibtn = (ImageButton) v.findViewById(R.id.btnEmailMember);
+			ibtn.setEnabled(contact.getEmail().length() > 0);
+			ibtn.setOnClickListener(new View.OnClickListener() {
 				public void onClick(View v) { context.EmailMember(contact); }
 			});
 			
-			btn = (Button) v.findViewById(R.id.btnCheckMember);
+			Button btn = (Button) v.findViewById(R.id.btnCheckMember);
 			btn.setOnClickListener(new View.OnClickListener() {
 				public void onClick(View v) { context.CheckMember(contact, (CheckBox)v); }
 			});

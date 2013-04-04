@@ -3,12 +3,6 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:orientation="vertical" >
-    
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/label_groupmembers"
-        android:textAppearance="?android:attr/textAppearanceLarge" />
 		
 	<LinearLayout
 		android:layout_width="fill_parent"
@@ -19,19 +13,24 @@
 				android:text="@string/btnSelectAll"
 				android:id="@+id/btnSelectAll"
 				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
+				android:layout_height="fill_parent"
+				android:layout_centerVertical="true"
 				android:paddingRight="5dp" />
 		
-			<Button
-				android:text="@string/btnEmailGroup"
+			<ImageButton
+				android:contentDescription="@string/btnEmailGroup"
 				android:id="@+id/btnEmailGroup"
+				android:src="@drawable/sym_action_email"
+				style="?android:attr/buttonBarButtonStyle"
 				android:layout_width="0dp"
 				android:layout_height="wrap_content"
 				android:layout_weight="1"/>
 				
-			<Button
-				android:text="@string/btnTextGroup"
+			<ImageButton
+				android:contentDescription="@string/btnTextGroup"
 				android:id="@+id/btnTextGroup"
+				android:src="@drawable/sym_action_email"
+				style="?android:attr/buttonBarButtonStyle"
 				android:layout_width="0dp"
 				android:layout_height="wrap_content"
 				android:layout_weight="1"/>
