@@ -16,7 +16,7 @@
 	<ImageButton
 		android:id="@+id/btnTextMember"
 		android:contentDescription="Text"
-		android:src="@drawable/sym_action_email"
+		android:src="@drawable/sms"
 		style="?android:attr/buttonBarButtonStyle"
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
