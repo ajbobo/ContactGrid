@@ -65,40 +65,6 @@
        id="linearGradient6263"
        xlink:href="#linearGradient6257-3"
        inkscape:collect="always" />
-    <linearGradient
-       osb:paint="gradient"
-       id="linearGradient6257-3">
-      <stop
-         id="stop6259-1"
-         offset="0"
-         style="stop-color:#888888;stop-opacity:1;" />
-      <stop
-         id="stop6261-6"
-         offset="1"
-         style="stop-color:#ffffff;stop-opacity:1;" />
-    </linearGradient>
-    <linearGradient
-       gradientTransform="matrix(1.2699127,0,0,1.2735922,-105.7042,144.18213)"
-       gradientUnits="userSpaceOnUse"
-       y2="525.91998"
-       x2="697.91998"
-       y1="277.28"
-       x1="100.8"
-       id="linearGradient6263-4"
-       xlink:href="#linearGradient6257-2"
-       inkscape:collect="always" />
-    <linearGradient
-       osb:paint="gradient"
-       id="linearGradient6257-2">
-      <stop
-         id="stop6259-6"
-         offset="0"
-         style="stop-color:#888888;stop-opacity:1;" />
-      <stop
-         id="stop6261-0"
-         offset="1"
-         style="stop-color:#ffffff;stop-opacity:1;" />
-    </linearGradient>
   </defs>
   <sodipodi:namedview
      id="base"
@@ -108,10 +74,10 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="0.52083333"
-     inkscape:cx="-82.601856"
+     inkscape:cx="-382.12186"
      inkscape:cy="295.43947"
      inkscape:document-units="px"
-     inkscape:current-layer="layer1"
+     inkscape:current-layer="g6237"
      showgrid="false"
      inkscape:window-width="1920"
      inkscape:window-height="1017"
@@ -128,7 +94,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
