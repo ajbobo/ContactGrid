@@ -89,8 +89,10 @@ public class ContactAdapter extends BaseAdapter
 			Bitmap bitmap = context.getGridPhoto(position);
 			if (bitmap != null)
 				iv.setImageBitmap(bitmap);
-			else
+			else if (context.isIndexAContact(position))
 				iv.setImageResource(R.drawable.android);
+			else
+				iv.setImageResource(R.drawable.group);
 		}
 		iv.getLayoutParams().width = imagesize;
 		iv.getLayoutParams().height = imagesize;
