@@ -20,7 +20,7 @@
 			<ImageButton
 				android:contentDescription="@string/btnEmailGroup"
 				android:id="@+id/btnEmailGroup"
-				android:src="@drawable/sms"
+				android:src="@drawable/email"
 				style="?android:attr/buttonBarButtonStyle"
 				android:layout_width="0dp"
 				android:layout_height="wrap_content"
@@ -29,7 +29,7 @@
 			<ImageButton
 				android:contentDescription="@string/btnTextGroup"
 				android:id="@+id/btnTextGroup"
-				android:src="@drawable/sym_action_email"
+				android:src="@drawable/sms"
 				style="?android:attr/buttonBarButtonStyle"
 				android:layout_width="0dp"
 				android:layout_height="wrap_content"
