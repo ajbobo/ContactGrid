@@ -47,15 +47,37 @@ public class GroupActions extends Activity
 
 		Intent intent = this.getIntent();
 		long groupid = intent.getLongExtra("GroupID", 0);
+		String groupname = "";
+		
+		// Get the group name
+		ContentResolver resolver = getContentResolver();
+		String[] projection = { Groups._ID, Groups.TITLE};
+		String constraint = Groups._ID + "=" + groupid;
+		Cursor cursor = resolver.query(Groups.CONTENT_URI, projection, constraint, null, "");
+		if (cursor.moveToFirst())
+			groupname = cursor.getString(cursor.getColumnIndex(Groups.TITLE));
+		cursor.close();
+		
+		// Get ids of all groups with this name
+		// Android groups don't go across accounts, I'm trying to fake it here
+		List<Long> groupids = new ArrayList<Long>();
+		constraint = Groups.TITLE + "= '" + groupname + "'";
+		cursor = resolver.query(Groups.CONTENT_URI, projection, constraint, null, "");
+		cursor.moveToFirst();
+		do
+		{
+			groupids.add(cursor.getLong(cursor.getColumnIndex(Groups._ID)));
+		} while (cursor.moveToNext());
+		cursor.close();		
 
-		// Get all of the MemberIDs of the group
-		String[] projection = { GroupMembership.CONTACT_ID };
-		String constraint = GroupMembership.GROUP_ROW_ID + "=" + groupid;
-		Cursor memberidcursor = managedQuery(Data.CONTENT_URI, projection, constraint, null, "");
-
+		// Get all of the MemberIDs of the groups with the right name
+		projection = new String[] { GroupMembership.CONTACT_ID };
+		constraint = GroupMembership.GROUP_ROW_ID + "=" + groupids.get(0);
+		for (int x = 1; x < groupids.size(); x++)
+			constraint += " OR " + GroupMembership.GROUP_ROW_ID + "=" + groupids.get(x);
+		Cursor memberidcursor = resolver.query(Data.CONTENT_URI, projection, constraint, null, "");
 		if (memberidcursor.moveToFirst())
 		{
-			ContentResolver resolver = getContentResolver();
 			int column = memberidcursor.getColumnIndex(GroupMembership.CONTACT_ID);
 
 			// For each ID find the actual contact
@@ -76,7 +98,7 @@ public class GroupActions extends Activity
 					constraint = Phone.CONTACT_ID + "=" + memberid + " AND " +
 					             Phone.TYPE + "=" + Phone.TYPE_MOBILE + " AND " +
 					             Phone.MIMETYPE + "='" + Phone.CONTENT_ITEM_TYPE +"'";
-					Cursor cursor = resolver.query(Data.CONTENT_URI, projection, constraint, null, "");
+					cursor = resolver.query(Data.CONTENT_URI, projection, constraint, null, "");
 					if (cursor.moveToFirst())
 					{
 						_groupmembers[x].setCellphone(cursor.getString(cursor.getColumnIndex(Phone.NUMBER)));
@@ -101,6 +123,7 @@ public class GroupActions extends Activity
 			ListView list = (ListView)findViewById(R.id.lstGroupMembers);
 			list.setAdapter(new SimpleContactAdapter(this));
 		}
+		memberidcursor.close();
 	}
 
 	/** Check to see if the device can handle SMS */
