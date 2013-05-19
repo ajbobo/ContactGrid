@@ -18,7 +18,6 @@ import java.util.*;
 
 public class GroupList extends Activity
 {
-	//private Cursor _groupcursor;
 	private List<GroupInfo> _grouplist;
 	
 	/** Called when the activity is first created */
@@ -66,8 +65,7 @@ public class GroupList extends Activity
 	
 	private void HandleClick(GroupInfo group)
 	{
-		//_groupcursor.moveToPosition(position);
-		int id = group.getID();// _groupcursor.getInt(_groupcursor.getColumnIndex(Groups._ID));
+		int id = group.getID();
 		
 		Intent data = new Intent();
 		data.setData(ContentUris.withAppendedId(Groups.CONTENT_URI, id));
