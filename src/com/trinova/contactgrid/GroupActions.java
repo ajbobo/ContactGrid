@@ -236,61 +236,23 @@ public class GroupActions extends Activity
 		private boolean _checked = false;
 		private long _id = -1;
 
-		public void setCellphone(String cellphone)
-		{
-			_cellphone = cellphone;
-		}
+		public void setCellphone(String cellphone){ _cellphone = cellphone; }
+		public String getCellphone() { return _cellphone; }
 
-		public String getCellphone()
-		{
-			return _cellphone;
-		}
+		public void setEmail(String email) { _email = email; }
+		public String getEmail() { return _email; }
 
-		public void setEmail(String email)
-		{
-			_email = email;
-		}
-
-		public String getEmail()
-		{
-			return _email;
-		}
-
-		public void setDisplayName(String displayname)
-		{
-			_displayname = displayname;
-		}
-
-		public String getDisplayName()
-		{
-			return _displayname;
-		}
+		public void setDisplayName(String displayname) { _displayname = displayname; }
+		public String getDisplayName() { return _displayname; }
 		
-		public boolean getChecked()
-		{
-			return _checked;
-		}
+		public boolean getChecked() { return _checked; }
+		public void setChecked(boolean value) { _checked = value; }
 		
-		public void setChecked(boolean value)
-		{
-			_checked = value;
-		}
-		
-		public long getID()
-		{
-			return _id;
-		}
-		
-		public void setID(long id)
-		{
-			_id = id;
-		}
+		public long getID() { return _id; }
+		public void setID(long id) { _id = id; }
 		
 		@Override
-		public String toString()
-		{
-			return _displayname;
-		}
+		public String toString() { return _displayname; }
 	}
 	
 	/** An Adapter to show group members and assign functionality to the views used */
@@ -336,10 +298,6 @@ public class GroupActions extends Activity
 			final SimpleContact contact = context._groupmembers[position];
 			TextView tv = (TextView) v.findViewById(R.id.txtGroupMemberName);
 			tv.setText(contact.getDisplayName());
-			tv.setOnClickListener(new View.OnClickListener()
-			{
-				public void onClick(View v) { context.DisplayMember(contact); }
-			});
 			
 			ImageButton ibtn = (ImageButton) v.findViewById(R.id.btnTextMember);
 			ibtn.setEnabled(contact.getCellphone().length() > 0 & context._smsavailable);
@@ -358,6 +316,11 @@ public class GroupActions extends Activity
 				public void onClick(View v) { context.CheckMember(contact, (CheckBox)v); }
 			});
 			
+			v.setOnClickListener(new View.OnClickListener() // Attach this to the view so that the user can click anywhere, not just on the name
+			{
+				public void onClick(View v) { context.DisplayMember(contact); }
+			});
+
 			return v;
 		}
 	}
