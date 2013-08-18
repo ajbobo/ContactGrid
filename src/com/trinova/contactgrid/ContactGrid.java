@@ -22,14 +22,12 @@ import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.GridView;
 import android.widget.Toast;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 
 public class ContactGrid extends Activity
 {
 	// Constants that are internal to this class
-	private static final int MENU_PREFERENCES = Menu.FIRST;
-	private static final int MENU_CONTACTS = Menu.FIRST + 1;
-
 	private static final int POPUP_OPTIONS_CONTACT = 1;
 	private static final int POPUP_OPTIONS_EMPTY = 2;
 
@@ -89,8 +87,6 @@ public class ContactGrid extends Activity
 			}
 		});
 
-		// Initialize the title bar
-		setWindowTitle();
 	}
 
 	/** Called when the activity is stopped */
@@ -112,10 +108,10 @@ public class ContactGrid extends Activity
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu)
 	{
-		menu.add(0, MENU_CONTACTS, 0, "Contacts").setIcon(R.drawable.ic_menu_cc);
-		menu.add(0, MENU_PREFERENCES, 0, "Preferences").setIcon(R.drawable.ic_menu_preferences);
+		MenuInflater inflater = getMenuInflater();
+		inflater.inflate(R.menu.main_grid_menu, menu);
 
-		return true;
+		return super.onCreateOptionsMenu(menu);
 	}
 
 	/** Handle menu items */
@@ -124,15 +120,15 @@ public class ContactGrid extends Activity
 	{
 		switch (item.getItemId())
 		{
-		case MENU_PREFERENCES:
+		case R.id.menu_preferences:
 			LaunchPreferences();
 			return true;
-		case MENU_CONTACTS:
+		case R.id.menu_contacts:
 			LaunchContacts();
 			return true;
 		}
 
-		return false;
+		return super.onOptionsItemSelected(item);
 	}
 
 	/** Handle return values from other activities */
@@ -409,14 +405,6 @@ public class ContactGrid extends Activity
 		}
 
 		return true;
-	}
-	
-	/** Sets the window's title based on the current mode */
-	private void setWindowTitle()
-	{
-		String title = "Contact Grid - Select Contact";
-
-		setTitle(title);
 	}
 
 	/** Display a short Toast with the specified text */
