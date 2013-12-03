@@ -14,6 +14,7 @@ import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 import java.util.*;
+import java.lang.Comparable;
 
 
 public class GroupList extends Activity
@@ -57,6 +58,8 @@ public class GroupList extends Activity
 		} while (groupcursor.moveToNext());
 		groupcursor.close();
 		
+		Collections.sort(_grouplist, Collections.reverseOrder());
+		
 		// Put the requested Group data into the ListView
 		ListView list = (ListView)findViewById(R.id.lstGroups);
 		GroupInfoAdapter adapter = new GroupInfoAdapter(this);
@@ -73,7 +76,7 @@ public class GroupList extends Activity
 		finish();
 	}
 	
-	private class GroupInfo
+	private class GroupInfo implements Comparable<GroupInfo>
 	{
 		private String _name;
 		private int _membercnt;
@@ -94,6 +97,11 @@ public class GroupList extends Activity
 		
 		@Override
 		public String toString() { return _name; }
+		
+		public int compareTo(GroupInfo other)
+		{
+			return other._name.compareTo(this._name);
+		}
 	}
 	
 	/** An Adapter to show group members and assign functionality to the views used */

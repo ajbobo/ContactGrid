@@ -11,6 +11,7 @@ import android.provider.ContactsContract.CommonDataKinds.*;
 import android.widget.*;
 import android.view.*;
 import java.util.*;
+import java.lang.Comparable;
 
 public class GroupActions extends Activity
 {
@@ -118,6 +119,9 @@ public class GroupActions extends Activity
 				}
 				membercursor.close();
 			}
+			
+			// Sort the list of members
+			Arrays.sort(_groupmembers, Collections.reverseOrder());
 
 			// Put the names in the list
 			ListView list = (ListView)findViewById(R.id.lstGroupMembers);
@@ -228,7 +232,7 @@ public class GroupActions extends Activity
 	
 	/** A class to hold basic information about a single contact.
 	    Easier to use this than to look up this information constantly. */
-	private class SimpleContact
+	private class SimpleContact implements Comparable<SimpleContact>
 	{
 		private String _displayname = "";
 		private String _email = "";
@@ -253,6 +257,11 @@ public class GroupActions extends Activity
 		
 		@Override
 		public String toString() { return _displayname; }
+		
+		public int compareTo(SimpleContact other)
+		{
+			return other._displayname.compareTo(this._displayname);
+		}
 	}
 	
 	/** An Adapter to show group members and assign functionality to the views used */
