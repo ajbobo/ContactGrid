@@ -56,7 +56,7 @@ public class ContactGrid extends Activity
 	{
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
-	
+
 		// Initialize preference variables
 		GetPreferences();
 
@@ -72,15 +72,13 @@ public class ContactGrid extends Activity
 		grid.setNumColumns(_numcols);
 		grid.setAdapter(new ContactAdapter(this));
 
-		grid.setOnItemClickListener(new OnItemClickListener()
-		{
+		grid.setOnItemClickListener(new OnItemClickListener() {
 			public void onItemClick(AdapterView<?> parent, View v, int position, long id)
 			{
 				HandleClickedItem(position, ACTION_SELECT);
 			}
 		});
-		grid.setOnItemLongClickListener(new OnItemLongClickListener()
-		{
+		grid.setOnItemLongClickListener(new OnItemLongClickListener() {
 			public boolean onItemLongClick(AdapterView<?> parent, View v, int position, long id)
 			{
 				return HandleLongClickedItem(position);
@@ -171,7 +169,7 @@ public class ContactGrid extends Activity
 					_savedKeys[index] = -key - 1; // Group id's are stored as negative numbers
 				}
 			}
-			
+
 			grid.invalidateViews();
 			break;
 		case CHANGE_PREFS:
@@ -184,7 +182,7 @@ public class ContactGrid extends Activity
 			break;
 		}
 	}
-	
+
 	/** Update the title of a Dialog because onCreateDialog() is only called once */
 	@Override
 	protected void onPrepareDialog(int id, Dialog dialog)
@@ -208,8 +206,7 @@ public class ContactGrid extends Activity
 		switch (realid)
 		{
 		case POPUP_OPTIONS_CONTACT:
-			return new AlertDialog.Builder(this).setTitle(getGridName(index)).setItems(R.array.list_popup_options_contact, new DialogInterface.OnClickListener()
-			{
+			return new AlertDialog.Builder(this).setTitle(getGridName(index)).setItems(R.array.list_popup_options_contact, new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int which)
 				{
 					switch (which)
@@ -224,8 +221,7 @@ public class ContactGrid extends Activity
 				}
 			}).create();
 		case POPUP_OPTIONS_EMPTY:
-			return new AlertDialog.Builder(this).setTitle("Empty Space").setItems(R.array.list_popup_options_empty, new DialogInterface.OnClickListener()
-			{
+			return new AlertDialog.Builder(this).setTitle("Empty Space").setItems(R.array.list_popup_options_empty, new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int which)
 				{
 					switch (which)
@@ -391,7 +387,7 @@ public class ContactGrid extends Activity
 		GridView grid = (GridView) findViewById(R.id.gridview);
 		grid.invalidateViews();
 	}
-	
+
 	/** Bring up a menu to valid options for the selected space */
 	private boolean HandleLongClickedItem(int index)
 	{
@@ -473,7 +469,7 @@ public class ContactGrid extends Activity
 
 		return "<null>";
 	}
-	
+
 	/** Converts the stored index for a group into a usable id */
 	private long getGroupID(int index)
 	{
@@ -486,25 +482,25 @@ public class ContactGrid extends Activity
 	{
 		return _numentries;
 	}
-	
+
 	/** Returns the number of columns in the grid */
 	public int getNumColumns()
 	{
 		return _numcols;
 	}
-	
+
 	/** Returns whether or not Action Shortcuts should be used */
 	public boolean getUseActionShortcuts()
 	{
 		return _actionshortcuts;
 	}
-	
+
 	/** Return whether or not the index is a contact (not a group) */
 	public boolean isIndexAContact(int index)
 	{
 		if (_savedKeys[index] < 0)
 			return false;
-			
+
 		return true;
 	}
 }

@@ -38,12 +38,12 @@ public class ContactAdapter extends BaseAdapter
 	public View getView(int position, View convertView, ViewGroup parent)
 	{
 		boolean useactionshortcuts = context.getUseActionShortcuts();
-		int imagesize = (int)(parent.getMeasuredWidth() / context.getNumColumns() * .9);
-		
+		int imagesize = (int) (parent.getMeasuredWidth() / context.getNumColumns() * .9);
+
 		int gridtoinflate = R.layout.gridicon;
 		if (context.hasContact(position) && context.isIndexAContact(position) && useactionshortcuts)
 			gridtoinflate = R.layout.gridicon_quickcontact;
-		
+
 		// Was the last view the right type?
 		if (convertView != null)
 		{
@@ -78,8 +78,7 @@ public class ContactAdapter extends BaseAdapter
 			{
 				iv = qcb; // Bitmaps will be assigned to the QuickContactBadge
 				qcb.assignContactUri(context.getGridURI(position));
-				qcb.setOnLongClickListener(new View.OnLongClickListener()
-				{
+				qcb.setOnLongClickListener(new View.OnLongClickListener() {
 					public boolean onLongClick(View v)
 					{
 						return false; // Does nothing - passes the LongClick up the hierarchy
