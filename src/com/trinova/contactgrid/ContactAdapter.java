@@ -1,6 +1,7 @@
 package com.trinova.contactgrid;
 
 //import android.R;
+
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.view.LayoutInflater;
@@ -11,32 +12,26 @@ import android.widget.ImageView;
 import android.widget.QuickContactBadge;
 import android.widget.TextView;
 
-public class ContactAdapter extends BaseAdapter
-{
+public class ContactAdapter extends BaseAdapter {
 	private ContactGrid context;
 
-	public ContactAdapter(Context c)
-	{
+	public ContactAdapter(Context c) {
 		context = (ContactGrid) c;
 	}
 
-	public int getCount()
-	{
+	public int getCount() {
 		return context.getNumEntries();
 	}
 
-	public Object getItem(int arg0)
-	{
+	public Object getItem(int arg0) {
 		return null;
 	}
 
-	public long getItemId(int arg0)
-	{
+	public long getItemId(int arg0) {
 		return 0;
 	}
 
-	public View getView(int position, View convertView, ViewGroup parent)
-	{
+	public View getView(int position, View convertView, ViewGroup parent) {
 		boolean useactionshortcuts = context.getUseActionShortcuts();
 		int imagesize = (int) (parent.getMeasuredWidth() / context.getNumColumns() * .9);
 
@@ -45,8 +40,7 @@ public class ContactAdapter extends BaseAdapter
 			gridtoinflate = R.layout.gridicon_quickcontact;
 
 		// Was the last view the right type?
-		if (convertView != null)
-		{
+		if (convertView != null) {
 			if (!convertView.getTag().equals(gridtoinflate))
 				convertView = null;
 		}
@@ -58,8 +52,7 @@ public class ContactAdapter extends BaseAdapter
 			v = li.inflate(gridtoinflate, null);
 			v.setTag(gridtoinflate); // Record which type of grid it is
 		}
-		else
-		{
+		else {
 			v = convertView;
 		}
 
@@ -71,16 +64,13 @@ public class ContactAdapter extends BaseAdapter
 			tv.setText("");
 			iv.setImageResource(R.drawable.question);
 		}
-		else
-		{
+		else {
 			tv.setText(context.getGridName(position));
-			if (useactionshortcuts && context.isIndexAContact(position))
-			{
+			if (useactionshortcuts && context.isIndexAContact(position)) {
 				iv = qcb; // Bitmaps will be assigned to the QuickContactBadge
 				qcb.assignContactUri(context.getGridURI(position));
 				qcb.setOnLongClickListener(new View.OnLongClickListener() {
-					public boolean onLongClick(View v)
-					{
+					public boolean onLongClick(View v) {
 						return false; // Does nothing - passes the LongClick up the hierarchy
 					}
 				});

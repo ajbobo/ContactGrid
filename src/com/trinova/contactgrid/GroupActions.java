@@ -10,18 +10,19 @@ import android.provider.ContactsContract.*;
 import android.provider.ContactsContract.CommonDataKinds.*;
 import android.widget.*;
 import android.view.*;
+
 import java.util.*;
 import java.lang.Comparable;
 
-public class GroupActions extends Activity
-{
+public class GroupActions extends Activity {
 	private Boolean _smsavailable;
 	private SimpleContact[] _groupmembers;
 
-	/** Called when the activity is first created */
+	/**
+	 * Called when the activity is first created
+	 */
 	@Override
-	protected void onCreate(Bundle savedInstanceState)
-	{
+	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.groupactionlayout);
 
@@ -29,16 +30,14 @@ public class GroupActions extends Activity
 
 		ImageButton ibtn = (ImageButton) findViewById(R.id.btnEmailGroup);
 		ibtn.setOnClickListener(new View.OnClickListener() {
-			public void onClick(View v)
-			{
+			public void onClick(View v) {
 				EmailGroup();
 			}
 		});
 
 		ibtn = (ImageButton) findViewById(R.id.btnTextGroup);
 		ibtn.setOnClickListener(new View.OnClickListener() {
-			public void onClick(View v)
-			{
+			public void onClick(View v) {
 				TextGroup();
 			}
 		});
@@ -46,8 +45,7 @@ public class GroupActions extends Activity
 
 		Button btn = (Button) findViewById(R.id.btnSelectAll);
 		btn.setOnClickListener(new View.OnClickListener() {
-			public void onClick(View v)
-			{
+			public void onClick(View v) {
 				SelectAll((CheckBox) v);
 			}
 		});
@@ -71,8 +69,7 @@ public class GroupActions extends Activity
 		constraint = Groups.TITLE + "= '" + groupname + "'";
 		cursor = resolver.query(Groups.CONTENT_URI, projection, constraint, null, "");
 		cursor.moveToFirst();
-		do
-		{
+		do {
 			groupids.add(cursor.getLong(cursor.getColumnIndex(Groups._ID)));
 		} while (cursor.moveToNext());
 		cursor.close();
@@ -83,19 +80,16 @@ public class GroupActions extends Activity
 		for (int x = 1; x < groupids.size(); x++)
 			constraint += " OR " + GroupMembership.GROUP_ROW_ID + "=" + groupids.get(x);
 		Cursor memberidcursor = resolver.query(Data.CONTENT_URI, projection, constraint, null, "");
-		if (memberidcursor.moveToFirst())
-		{
+		if (memberidcursor.moveToFirst()) {
 			int column = memberidcursor.getColumnIndex(GroupMembership.CONTACT_ID);
 
 			// For each ID find the actual contact
 			_groupmembers = new SimpleContact[memberidcursor.getCount()];
-			for (int x = 0; x < _groupmembers.length; x++, memberidcursor.moveToNext())
-			{
+			for (int x = 0; x < _groupmembers.length; x++, memberidcursor.moveToNext()) {
 				long memberid = memberidcursor.getLong(column);
 				Uri uri = ContentUris.withAppendedId(Contacts.CONTENT_URI, memberid);
 				Cursor membercursor = resolver.query(uri, null, null, null, null);
-				if (membercursor.moveToFirst())
-				{
+				if (membercursor.moveToFirst()) {
 					_groupmembers[x] = new SimpleContact();
 					_groupmembers[x].setDisplayName(membercursor.getString(membercursor.getColumnIndex(Contacts.DISPLAY_NAME)));
 					_groupmembers[x].setID(memberid);
@@ -104,8 +98,7 @@ public class GroupActions extends Activity
 					projection = new String[] { Phone.CONTACT_ID, Phone.NUMBER, Phone.TYPE };
 					constraint = Phone.CONTACT_ID + "=" + memberid + " AND " + Phone.TYPE + "=" + Phone.TYPE_MOBILE + " AND " + Phone.MIMETYPE + "='" + Phone.CONTENT_ITEM_TYPE + "'";
 					cursor = resolver.query(Data.CONTENT_URI, projection, constraint, null, "");
-					if (cursor.moveToFirst())
-					{
+					if (cursor.moveToFirst()) {
 						_groupmembers[x].setCellphone(cursor.getString(cursor.getColumnIndex(Phone.NUMBER)));
 					}
 					cursor.close();
@@ -114,8 +107,7 @@ public class GroupActions extends Activity
 					projection = new String[] { Email.CONTACT_ID, Email.DATA1 }; // Data1 = Address - for some reason Eclipse won't recognize Email.Address
 					constraint = Email.CONTACT_ID + "=" + memberid + " AND " + Email.MIMETYPE + "='" + Email.CONTENT_ITEM_TYPE + "'";
 					cursor = resolver.query(Data.CONTENT_URI, projection, constraint, null, "");
-					if (cursor.moveToFirst())
-					{
+					if (cursor.moveToFirst()) {
 						_groupmembers[x].setEmail(cursor.getString(cursor.getColumnIndex(Email.DATA1)));
 					}
 					cursor.close();
@@ -133,9 +125,10 @@ public class GroupActions extends Activity
 		memberidcursor.close();
 	}
 
-	/** Check to see if the device can handle SMS */
-	private void checkForSMS()
-	{
+	/**
+	 * Check to see if the device can handle SMS
+	 */
+	private void checkForSMS() {
 		// Is SMS Available on this device?
 		Intent intent = new Intent(Intent.ACTION_VIEW);
 		intent.setType("vnd.android-dir/mms-sms");
@@ -144,14 +137,14 @@ public class GroupActions extends Activity
 		_smsavailable = activities.size() > 0;
 	}
 
-	/** Mark all members as selected or not */
-	private void SelectAll(CheckBox box)
-	{
+	/**
+	 * Mark all members as selected or not
+	 */
+	private void SelectAll(CheckBox box) {
 		boolean checked = box.isChecked();
 		ListView list = (ListView) findViewById(R.id.lstGroupMembers);
 		int cnt = list.getChildCount();
-		for (int x = 0; x < cnt; x++)
-		{
+		for (int x = 0; x < cnt; x++) {
 			View v = list.getChildAt(x);
 			CheckBox memberbox = (CheckBox) v.findViewById(R.id.btnCheckMember);
 			memberbox.setChecked(checked);
@@ -159,12 +152,12 @@ public class GroupActions extends Activity
 		}
 	}
 
-	/** Compose an email to all selected members */
-	private void EmailGroup()
-	{
+	/**
+	 * Compose an email to all selected members
+	 */
+	private void EmailGroup() {
 		String[] addresses = new String[_groupmembers.length];
-		for (int x = 0; x < _groupmembers.length; x++)
-		{
+		for (int x = 0; x < _groupmembers.length; x++) {
 			if (!_groupmembers[x].getChecked())
 				continue;
 			addresses[x] = _groupmembers[x].getEmail();
@@ -175,12 +168,12 @@ public class GroupActions extends Activity
 		startActivity(intent);
 	}
 
-	/** Compose a text to all selected members */
-	private void TextGroup()
-	{
+	/**
+	 * Compose a text to all selected members
+	 */
+	private void TextGroup() {
 		String numbers = "smsto:";
-		for (int x = 0; x < _groupmembers.length; x++)
-		{
+		for (int x = 0; x < _groupmembers.length; x++) {
 			if (!_groupmembers[x].getChecked())
 				continue;
 			if (_groupmembers[x].getCellphone().length() == 0)
@@ -195,18 +188,20 @@ public class GroupActions extends Activity
 		startActivity(intent);
 	}
 
-	/** Mark or unmark a member as selected */
-	private void CheckMember(SimpleContact contact, CheckBox box)
-	{
+	/**
+	 * Mark or unmark a member as selected
+	 */
+	private void CheckMember(SimpleContact contact, CheckBox box) {
 		CheckBox btn = (CheckBox) findViewById(R.id.btnSelectAll);
 		btn.setChecked(false);
 
 		contact.setChecked(box.isChecked());
 	}
 
-	/** Compose an email to a single member */
-	private void EmailMember(SimpleContact contact)
-	{
+	/**
+	 * Compose an email to a single member
+	 */
+	private void EmailMember(SimpleContact contact) {
 		String[] addresses = new String[1];
 		addresses[0] = contact.getEmail();
 
@@ -216,18 +211,20 @@ public class GroupActions extends Activity
 		startActivity(intent);
 	}
 
-	/** Compose a text to a single member */
-	private void TextMember(SimpleContact contact)
-	{
+	/**
+	 * Compose a text to a single member
+	 */
+	private void TextMember(SimpleContact contact) {
 		String number = "smsto:" + contact.getCellphone();
 
 		Intent intent = new Intent(Intent.ACTION_SENDTO, Uri.parse(number));
 		startActivity(intent);
 	}
 
-	/** Show the device's information for a single member */
-	private void DisplayMember(SimpleContact contact)
-	{
+	/**
+	 * Show the device's information for a single member
+	 */
+	private void DisplayMember(SimpleContact contact) {
 		Uri uri = ContentUris.withAppendedId(Contacts.CONTENT_URI, contact.getID());
 		Intent intent = new Intent(Intent.ACTION_VIEW, uri);
 		intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS | Intent.FLAG_ACTIVITY_NO_HISTORY);
@@ -237,103 +234,86 @@ public class GroupActions extends Activity
 	/**
 	 * A class to hold basic information about a single contact. Easier to use this than to look up this information constantly.
 	 */
-	private class SimpleContact implements Comparable<SimpleContact>
-	{
+	private class SimpleContact implements Comparable<SimpleContact> {
 		private String _displayname = "";
 		private String _email = "";
 		private String _cellphone = "";
 		private boolean _checked = false;
 		private long _id = -1;
 
-		public void setCellphone(String cellphone)
-		{
+		public void setCellphone(String cellphone) {
 			_cellphone = cellphone;
 		}
 
-		public String getCellphone()
-		{
+		public String getCellphone() {
 			return _cellphone;
 		}
 
-		public void setEmail(String email)
-		{
+		public void setEmail(String email) {
 			_email = email;
 		}
 
-		public String getEmail()
-		{
+		public String getEmail() {
 			return _email;
 		}
 
-		public void setDisplayName(String displayname)
-		{
+		public void setDisplayName(String displayname) {
 			_displayname = displayname;
 		}
 
-		public String getDisplayName()
-		{
+		public String getDisplayName() {
 			return _displayname;
 		}
 
-		public boolean getChecked()
-		{
+		public boolean getChecked() {
 			return _checked;
 		}
 
-		public void setChecked(boolean value)
-		{
+		public void setChecked(boolean value) {
 			_checked = value;
 		}
 
-		public long getID()
-		{
+		public long getID() {
 			return _id;
 		}
 
-		public void setID(long id)
-		{
+		public void setID(long id) {
 			_id = id;
 		}
 
 		@Override
-		public String toString()
-		{
+		public String toString() {
 			return _displayname;
 		}
 
-		public int compareTo(SimpleContact other)
-		{
+		public int compareTo(SimpleContact other) {
 			return other._displayname.compareTo(this._displayname);
 		}
 	}
 
-	/** An Adapter to show group members and assign functionality to the views used */
-	private class SimpleContactAdapter extends BaseAdapter
-	{
+	/**
+	 * An Adapter to show group members and assign functionality to the views used
+	 */
+	private class SimpleContactAdapter extends BaseAdapter {
 		private GroupActions context;
 
-		public SimpleContactAdapter(Context c)
-		{
+		public SimpleContactAdapter(Context c) {
 			context = (GroupActions) c;
 		}
 
-		public int getCount()
-		{
+		public int getCount() {
 			return context._groupmembers.length;
 		}
 
-		public Object getItem(int arg0)
-		{
+		public Object getItem(int arg0) {
 			return null;
 		}
 
-		public long getItemId(int arg0)
-		{
+		public long getItemId(int arg0) {
 			return 0;
 		}
 
-		public View getView(int position, View convertView, ViewGroup parent)
-		{
+		public View getView(int position, View convertView, ViewGroup parent) {
 			int entrytoinflate = R.layout.groupactionentry;
 
 			View v;
@@ -342,8 +322,7 @@ public class GroupActions extends Activity
 				LayoutInflater li = context.getLayoutInflater();
 				v = li.inflate(entrytoinflate, null);
 			}
-			else
-			{
+			else {
 				v = convertView;
 			}
 
@@ -354,8 +333,7 @@ public class GroupActions extends Activity
 			ImageButton ibtn = (ImageButton) v.findViewById(R.id.btnTextMember);
 			ibtn.setEnabled(contact.getCellphone().length() > 0 & context._smsavailable);
 			ibtn.setOnClickListener(new View.OnClickListener() {
-				public void onClick(View v)
-				{
+				public void onClick(View v) {
 					context.TextMember(contact);
 				}
 			});
@@ -363,24 +341,21 @@ public class GroupActions extends Activity
 			ibtn = (ImageButton) v.findViewById(R.id.btnEmailMember);
 			ibtn.setEnabled(contact.getEmail().length() > 0);
 			ibtn.setOnClickListener(new View.OnClickListener() {
-				public void onClick(View v)
-				{
+				public void onClick(View v) {
 					context.EmailMember(contact);
 				}
 			});
 
 			Button btn = (Button) v.findViewById(R.id.btnCheckMember);
 			btn.setOnClickListener(new View.OnClickListener() {
-				public void onClick(View v)
-				{
+				public void onClick(View v) {
 					context.CheckMember(contact, (CheckBox) v);
 				}
 			});
 
 			v.setOnClickListener(new View.OnClickListener() // Attach this to the view so that the user can click anywhere, not just on the name
 			{
-				public void onClick(View v)
-				{
+				public void onClick(View v) {
 					context.DisplayMember(contact);
 				}
 			});

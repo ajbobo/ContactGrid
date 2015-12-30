@@ -13,17 +13,18 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+
 import java.util.*;
 import java.lang.Comparable;
 
-public class GroupList extends Activity
-{
+public class GroupList extends Activity {
 	private List<GroupInfo> _grouplist;
 
-	/** Called when the activity is first created */
+	/**
+	 * Called when the activity is first created
+	 */
 	@Override
-	protected void onCreate(Bundle savedInstanceState)
-	{
+	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.grouplistlayout);
 
@@ -32,41 +33,46 @@ public class GroupList extends Activity
 		String[] projection = { Groups._ID, Groups.TITLE, Groups.SUMMARY_COUNT };
 		String constraint = Groups.SUMMARY_COUNT + " > 0";
 		Cursor groupcursor = managedQuery(Groups.CONTENT_SUMMARY_URI, projection, constraint, null, "");
-		groupcursor.moveToFirst();
-		do
-		{
-			String name = groupcursor.getString(groupcursor.getColumnIndex(Groups.TITLE));
-			GroupInfo group = null;
-			for (int x = 0; x < _grouplist.size() && group == null; x++)
-			{
-				if (name.equals(_grouplist.get(x).getName()))
-					group = _grouplist.get(x);
-			}
-			if (group == null) // haven't seen this group yet
-			{
-				group = new GroupInfo();
-				group.setName(name);
-				group.setID(groupcursor.getInt(groupcursor.getColumnIndex(Groups._ID)));
-				group.setMemberCnt(groupcursor.getInt(groupcursor.getColumnIndex(Groups.SUMMARY_COUNT)));
-				_grouplist.add(group);
-			}
-			else
-			{
-				group.addMembers(groupcursor.getInt(groupcursor.getColumnIndex(Groups.SUMMARY_COUNT)));
-			}
-		} while (groupcursor.moveToNext());
-		groupcursor.close();
+		int groupCount = groupcursor.getCount();
+		if (groupCount == 0) {
+			Intent data = new Intent();
+			data.setData(null);
+			setResult(Activity.RESULT_CANCELED, data); // Return the Group's ID to the calling activity
+			finish();
+		}
+		else {
+			groupcursor.moveToFirst();
+			do {
+				String name = groupcursor.getString(groupcursor.getColumnIndex(Groups.TITLE));
+				GroupInfo group = null;
+				for (int x = 0; x < _grouplist.size() && group == null; x++) {
+					if (name.equals(_grouplist.get(x).getName()))
+						group = _grouplist.get(x);
+				}
+				if (group == null) // haven't seen this group yet
+				{
+					group = new GroupInfo();
+					group.setName(name);
+					group.setID(groupcursor.getInt(groupcursor.getColumnIndex(Groups._ID)));
+					group.setMemberCnt(groupcursor.getInt(groupcursor.getColumnIndex(Groups.SUMMARY_COUNT)));
+					_grouplist.add(group);
+				}
+				else {
+					group.addMembers(groupcursor.getInt(groupcursor.getColumnIndex(Groups.SUMMARY_COUNT)));
+				}
+			} while (groupcursor.moveToNext());
+			groupcursor.close();
 
-		Collections.sort(_grouplist, Collections.reverseOrder());
+			Collections.sort(_grouplist, Collections.reverseOrder());
 
-		// Put the requested Group data into the ListView
-		ListView list = (ListView) findViewById(R.id.lstGroups);
-		GroupInfoAdapter adapter = new GroupInfoAdapter(this);
-		list.setAdapter(adapter);
+			// Put the requested Group data into the ListView
+			ListView list = (ListView) findViewById(R.id.lstGroups);
+			GroupInfoAdapter adapter = new GroupInfoAdapter(this);
+			list.setAdapter(adapter);
+		}
 	}
 
-	private void HandleClick(GroupInfo group)
-	{
+	private void HandleClick(GroupInfo group) {
 		int id = group.getID();
 
 		Intent data = new Intent();
@@ -75,86 +81,72 @@ public class GroupList extends Activity
 		finish();
 	}
 
-	private class GroupInfo implements Comparable<GroupInfo>
-	{
+	private class GroupInfo implements Comparable<GroupInfo> {
 		private String _name;
 		private int _membercnt;
 		private int _id;
 
-		public String getName()
-		{
+		public String getName() {
 			return _name;
 		}
 
-		public void setName(String name)
-		{
+		public void setName(String name) {
 			_name = name;
 		}
 
-		public int getMemberCnt()
-		{
+		public int getMemberCnt() {
 			return _membercnt;
 		}
 
-		public void setMemberCnt(int cnt)
-		{
+		public void setMemberCnt(int cnt) {
 			_membercnt = cnt;
 		}
 
-		public void addMembers(int newMembers)
-		{
+		public void addMembers(int newMembers) {
 			_membercnt += newMembers;
 		}
 
-		public int getID()
-		{
+		public int getID() {
 			return _id;
 		}
 
-		public void setID(int id)
-		{
+		public void setID(int id) {
 			_id = id;
 		}
 
 		@Override
-		public String toString()
-		{
+		public String toString() {
 			return _name;
 		}
 
-		public int compareTo(GroupInfo other)
-		{
+		public int compareTo(GroupInfo other) {
 			return other._name.compareTo(this._name);
 		}
 	}
 
-	/** An Adapter to show group members and assign functionality to the views used */
-	private class GroupInfoAdapter extends BaseAdapter
-	{
+	/**
+	 * An Adapter to show group members and assign functionality to the views used
+	 */
+	private class GroupInfoAdapter extends BaseAdapter {
 		private GroupList context;
 
-		public GroupInfoAdapter(Context c)
-		{
+		public GroupInfoAdapter(Context c) {
 			context = (GroupList) c;
 		}
 
-		public int getCount()
-		{
+		public int getCount() {
 			return context._grouplist.size();
 		}
 
-		public Object getItem(int arg0)
-		{
+		public Object getItem(int arg0) {
 			return null;
 		}
 
-		public long getItemId(int arg0)
-		{
+		public long getItemId(int arg0) {
 			return 0;
 		}
 
-		public View getView(int position, View convertView, ViewGroup parent)
-		{
+		public View getView(int position, View convertView, ViewGroup parent) {
 			int entrytoinflate = R.layout.grouplistentry;
 
 			View v;
@@ -163,8 +155,7 @@ public class GroupList extends Activity
 				LayoutInflater li = context.getLayoutInflater();
 				v = li.inflate(entrytoinflate, null);
 			}
-			else
-			{
+			else {
 				v = convertView;
 			}
 
@@ -177,8 +168,7 @@ public class GroupList extends Activity
 
 			v.setOnClickListener(new View.OnClickListener() // Attach this to the view so that the user can click anywhere - not just on the name
 			{
-				public void onClick(View v)
-				{
+				public void onClick(View v) {
 					context.HandleClick(group);
 				}
 			});
