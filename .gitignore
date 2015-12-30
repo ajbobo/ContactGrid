@@ -31,4 +31,5 @@ proguard/
 .navigation/
 
 # IDEA project file
+.idea/
 *.iml
