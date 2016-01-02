@@ -2,34 +2,34 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:orientation="horizontal" >
-	
-	<CheckBox
-		android:id="@+id/btnCheckMember"
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:paddingRight="5dp"
-		android:paddingLeft="0dp"
-		android:layout_alignParentLeft="true"
-		android:layout_centerVertical="true"/>
+    android:orientation="horizontal">
 
-	<ImageButton
-		android:id="@+id/btnTextMember"
-		android:contentDescription="Text"
-		android:src="@drawable/sms"
-		style="?android:attr/buttonBarButtonStyle"
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:layout_alignParentRight="true"/>
-		
-	<ImageButton
-		android:id="@+id/btnEmailMember"
-		android:contentDescription="Email"
-		android:src="@drawable/email"
-		style="?android:attr/buttonBarButtonStyle"
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:layout_toLeftOf="@id/btnTextMember"/>
+    <CheckBox
+        android:id="@+id/btnCheckMember"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingRight="5dp"
+        android:paddingLeft="0dp"
+        android:layout_alignParentLeft="true"
+        android:layout_centerVertical="true" />
+
+    <ImageButton
+        android:id="@+id/btnTextMember"
+        android:contentDescription="Text"
+        android:src="@drawable/sms"
+        style="?android:attr/buttonBarButtonStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true" />
+
+    <ImageButton
+        android:id="@+id/btnEmailMember"
+        android:contentDescription="Email"
+        android:src="@drawable/email"
+        style="?android:attr/buttonBarButtonStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toLeftOf="@id/btnTextMember" />
 
     <TextView
         android:id="@+id/txtGroupMemberName"
@@ -37,6 +37,6 @@
         android:layout_height="fill_parent"
         android:layout_centerVertical="true"
         android:textAppearance="?android:attr/textAppearanceLarge"
-        android:layout_toRightOf="@id/btnCheckMember"/>
+        android:layout_toRightOf="@id/btnCheckMember" />
 
 </RelativeLayout>
