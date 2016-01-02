@@ -1,0 +1,4 @@
+Crash when trying to add a Group if there aren't any defined. - Fixed
+Hide/disable "Use Action Shortcuts" for Android version 6+ (or 5+?)
+Change dialogs from deprecated code to DialogFragment
+Change Preferences from deprecated code
