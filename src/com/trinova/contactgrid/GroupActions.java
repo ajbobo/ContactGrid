@@ -131,7 +131,7 @@ public class GroupActions extends Activity {
 	private void checkForSMS() {
 		// Is SMS Available on this device?
 		Intent intent = new Intent(Intent.ACTION_VIEW);
-		intent.setType("vnd.android-dir/mms-sms");
+		intent.setData(Uri.parse("smsto:"));
 		PackageManager packageManager = getPackageManager();
 		List<ResolveInfo> activities = packageManager.queryIntentActivities(intent, 0);
 		_smsavailable = activities.size() > 0;
@@ -156,22 +156,30 @@ public class GroupActions extends Activity {
 	 * Compose an email to all selected members
 	 */
 	private void EmailGroup() {
+		int checkedCount = 0;
 		String[] addresses = new String[_groupmembers.length];
 		for (int x = 0; x < _groupmembers.length; x++) {
 			if (!_groupmembers[x].getChecked())
 				continue;
 			addresses[x] = _groupmembers[x].getEmail();
+			checkedCount++;
 		}
-		Intent intent = new Intent(Intent.ACTION_SEND);
-		intent.setType("plain/text");
-		intent.putExtra(Intent.EXTRA_EMAIL, addresses);
-		startActivity(intent);
+		if (checkedCount > 0) {
+			Intent intent = new Intent(Intent.ACTION_SEND);
+			intent.setType("plain/text");
+			intent.putExtra(Intent.EXTRA_EMAIL, addresses);
+			startActivity(intent);
+		}
+		else {
+			Toast.makeText(this, "You do not have any group members selected", Toast.LENGTH_SHORT).show();
+		}
 	}
 
 	/**
 	 * Compose a text to all selected members
 	 */
 	private void TextGroup() {
+		int checkedCount = 0;
 		String numbers = "smsto:";
 		for (int x = 0; x < _groupmembers.length; x++) {
 			if (!_groupmembers[x].getChecked())
@@ -182,10 +190,16 @@ public class GroupActions extends Activity {
 			if (x > 0)
 				numbers += ","; // This may need to be a ; for some phones
 			numbers += _groupmembers[x].getCellphone();
+			checkedCount++;
 		}
 
-		Intent intent = new Intent(Intent.ACTION_SENDTO, Uri.parse(numbers));
-		startActivity(intent);
+		if (checkedCount > 0) {
+			Intent intent = new Intent(Intent.ACTION_SENDTO, Uri.parse(numbers));
+			startActivity(intent);
+		}
+		else {
+			Toast.makeText(this, "You do not have any group members selected", Toast.LENGTH_SHORT).show();
+		}
 	}
 
 	/**
