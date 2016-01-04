@@ -1,6 +1,10 @@
-Crash when trying to add a Group if there aren't any defined. - Fixed - Released
-Group view doesn't enable SMS on Nexus 5 - Fixed - Released
+-- Items to do --
+Add Wear support - How do I do this and keep support for earlier versions of Android?
 Hide/disable "Use Action Shortcuts" for Android version 6+ (or 5+?)
 Change dialogs from deprecated code to DialogFragment
 Change Preferences from deprecated code
-Add Wear support - How do I do this and keep support for earlier versions of Android?
+
+-- Completed items --
+Crash when trying to add a Group if there aren't any defined. - Fixed - Released 1/2/2015
+Group view doesn't enable SMS on Nexus 5 - Fixed - Released 1/2/2015
+Migrated to Gradle - Done 1/2/2015
