@@ -1,5 +1,6 @@
 package com.trinova.contactgrid;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -7,10 +8,12 @@ import android.content.ContentUris;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.provider.ContactsContract;
@@ -42,6 +45,8 @@ public class ContactGrid extends Activity {
 
 	private static final long NO_CONTACT = -1;
 
+	private static final int PERMISSION_READ_CONTACTS_REQUEST = 1;
+
 	// Class variables
 	private long[] _savedKeys;
 	private boolean _showmessages;
@@ -49,6 +54,7 @@ public class ContactGrid extends Activity {
 	private int _numrows;
 	private int _numcols;
 	private int _numentries;
+	private boolean _readContactsAllowed;
 
 	/**
 	 * Called when the activity is first created.
@@ -65,6 +71,20 @@ public class ContactGrid extends Activity {
 		SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
 		for (int x = 0; x < _numentries; x++) {
 			_savedKeys[x] = settings.getLong("SavedID" + x, NO_CONTACT);
+		}
+
+		// Check to see if the READ_CONTACTS permission has been granted
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) { // Marshmallow or later
+			if (checkSelfPermission(Manifest.permission.READ_CONTACTS) == PackageManager.PERMISSION_GRANTED) {
+				_readContactsAllowed = true;
+			}
+			else {
+				_readContactsAllowed = false;
+				requestPermissions(new String[] { Manifest.permission.READ_CONTACTS }, PERMISSION_READ_CONTACTS_REQUEST);
+			}
+		}
+		else { // Pre-marshmallow
+			_readContactsAllowed = true;
 		}
 
 		// Initialize the grid
@@ -178,6 +198,20 @@ public class ContactGrid extends Activity {
 				grid.setNumColumns(_numcols);
 				grid.invalidateViews();
 				break;
+		}
+	}
+
+	/**
+	 * Handle return value from Permissions request
+	 */
+	@Override
+	public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantPermissions) {
+		switch (requestCode) {
+			case PERMISSION_READ_CONTACTS_REQUEST: {
+				_readContactsAllowed = (grantPermissions.length > 0 && grantPermissions[0] == PackageManager.PERMISSION_GRANTED);
+				if (_readContactsAllowed) // If the user granted the permission, restart the Activity so that it is refreshed correctly
+					this.recreate();
+			}
 		}
 	}
 
@@ -346,8 +380,13 @@ public class ContactGrid extends Activity {
 		else if (action == ACTION_ADD) {
 			if (!hasContact(index)) {
 				// Opens a Contact list so that the user can select a Contact to add to the Grid
-				Intent intent = new Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI);
-				startActivityForResult(intent, PICK_CONTACT * 100 + index); // Merge the request code and the index into a single value
+				if (_readContactsAllowed) {
+					Intent intent = new Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI);
+					startActivityForResult(intent, PICK_CONTACT * 100 + index); // Merge the request code and the index into a single value
+				}
+				else {
+					showToast("You have not granted permission to access your Contacts");
+				}
 			}
 			else if (_showmessages) {
 				showToast("That space is already taken");
@@ -355,10 +394,15 @@ public class ContactGrid extends Activity {
 		}
 		else if (action == ACTION_ADD_GROUP) {
 			if (!hasContact(index)) {
-				// Opens a list of Groups (there isn't a standard one, so I had to write a custom one)
-				Intent intent = new Intent();
-				intent.setClass(this, GroupList.class);
-				startActivityForResult(intent, PICK_GROUP * 100 + index); // Merge the request code and the index into a single value
+				if (_readContactsAllowed) {
+					// Opens a list of Groups (there isn't a standard one, so I had to write a custom one)
+					Intent intent = new Intent();
+					intent.setClass(this, GroupList.class);
+					startActivityForResult(intent, PICK_GROUP * 100 + index); // Merge the request code and the index into a single value
+				}
+				else {
+					showToast("You have not granted permission to access your Contacts");
+				}
 			}
 			else if (_showmessages) {
 				showToast("That space is already taken");
@@ -411,6 +455,9 @@ public class ContactGrid extends Activity {
 	 */
 	public Uri getGridURI(int index) {
 		if (!hasContact(index))
+			return null;
+
+		if (!_readContactsAllowed)
 			return null;
 
 		Uri griduri;
