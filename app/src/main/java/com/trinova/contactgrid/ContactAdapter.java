@@ -32,16 +32,16 @@ public class ContactAdapter extends BaseAdapter {
 	}
 
 	public View getView(int position, View convertView, ViewGroup parent) {
-		boolean useactionshortcuts = context.getUseActionShortcuts();
-		int imagesize = (int) (parent.getMeasuredWidth() / context.getNumColumns() * .9);
+		boolean useActionShortcuts = context.getUseActionShortcuts();
+		int imageSize = (int) (parent.getMeasuredWidth() / context.getNumColumns() * .9);
 
-		int gridtoinflate = R.layout.gridicon;
-		if (context.hasContact(position) && context.isIndexAContact(position) && useactionshortcuts)
-			gridtoinflate = R.layout.gridicon_quickcontact;
+		int gridToInflate = R.layout.gridicon;
+		if (context.hasContact(position) && context.isIndexAContact(position) && useActionShortcuts)
+			gridToInflate = R.layout.gridicon_quickcontact;
 
 		// Was the last view the right type?
 		if (convertView != null) {
-			if (!convertView.getTag().equals(gridtoinflate))
+			if (!convertView.getTag().equals(gridToInflate))
 				convertView = null;
 		}
 
@@ -49,8 +49,8 @@ public class ContactAdapter extends BaseAdapter {
 		if (convertView == null) // if it's not recycled, initialize some attributes
 		{
 			LayoutInflater li = context.getLayoutInflater();
-			v = li.inflate(gridtoinflate, null);
-			v.setTag(gridtoinflate); // Record which type of grid it is
+			v = li.inflate(gridToInflate, null);
+			v.setTag(gridToInflate); // Record which type of grid it is
 		}
 		else {
 			v = convertView;
@@ -66,7 +66,7 @@ public class ContactAdapter extends BaseAdapter {
 		}
 		else {
 			tv.setText(context.getGridName(position));
-			if (useactionshortcuts && context.isIndexAContact(position)) {
+			if (useActionShortcuts && context.isIndexAContact(position)) {
 				iv = qcb; // Bitmaps will be assigned to the QuickContactBadge
 				qcb.assignContactUri(context.getGridURI(position));
 				qcb.setOnLongClickListener(new View.OnLongClickListener() {
@@ -83,8 +83,8 @@ public class ContactAdapter extends BaseAdapter {
 			else
 				iv.setImageResource(R.drawable.group);
 		}
-		iv.getLayoutParams().width = imagesize;
-		iv.getLayoutParams().height = imagesize;
+		iv.getLayoutParams().width = imageSize;
+		iv.getLayoutParams().height = imageSize;
 		return v;
 	}
 }

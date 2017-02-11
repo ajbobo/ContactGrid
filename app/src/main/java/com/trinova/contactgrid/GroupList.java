@@ -18,7 +18,7 @@ import java.util.*;
 import java.lang.Comparable;
 
 public class GroupList extends Activity {
-	private List<GroupInfo> _grouplist;
+	private List<GroupInfo> groupList;
 
 	/**
 	 * Called when the activity is first created
@@ -29,11 +29,11 @@ public class GroupList extends Activity {
 		setContentView(R.layout.grouplistlayout);
 
 		// Get all of the Groups and information about each
-		_grouplist = new ArrayList<GroupInfo>();
+		groupList = new ArrayList<GroupInfo>();
 		String[] projection = { Groups._ID, Groups.TITLE, Groups.SUMMARY_COUNT };
 		String constraint = Groups.SUMMARY_COUNT + " > 0";
-		Cursor groupcursor = managedQuery(Groups.CONTENT_SUMMARY_URI, projection, constraint, null, "");
-		int groupCount = groupcursor.getCount();
+		Cursor groupCursor = managedQuery(Groups.CONTENT_SUMMARY_URI, projection, constraint, null, "");
+		int groupCount = groupCursor.getCount();
 		if (groupCount == 0) {
 			Intent data = new Intent();
 			data.setData(null);
@@ -41,29 +41,29 @@ public class GroupList extends Activity {
 			finish();
 		}
 		else {
-			groupcursor.moveToFirst();
+			groupCursor.moveToFirst();
 			do {
-				String name = groupcursor.getString(groupcursor.getColumnIndex(Groups.TITLE));
+				String name = groupCursor.getString(groupCursor.getColumnIndex(Groups.TITLE));
 				GroupInfo group = null;
-				for (int x = 0; x < _grouplist.size() && group == null; x++) {
-					if (name.equals(_grouplist.get(x).getName()))
-						group = _grouplist.get(x);
+				for (int x = 0; x < groupList.size() && group == null; x++) {
+					if (name.equals(groupList.get(x).getName()))
+						group = groupList.get(x);
 				}
 				if (group == null) // haven't seen this group yet
 				{
 					group = new GroupInfo();
 					group.setName(name);
-					group.setID(groupcursor.getInt(groupcursor.getColumnIndex(Groups._ID)));
-					group.setMemberCnt(groupcursor.getInt(groupcursor.getColumnIndex(Groups.SUMMARY_COUNT)));
-					_grouplist.add(group);
+					group.setID(groupCursor.getInt(groupCursor.getColumnIndex(Groups._ID)));
+					group.setMemberCnt(groupCursor.getInt(groupCursor.getColumnIndex(Groups.SUMMARY_COUNT)));
+					groupList.add(group);
 				}
 				else {
-					group.addMembers(groupcursor.getInt(groupcursor.getColumnIndex(Groups.SUMMARY_COUNT)));
+					group.addMembers(groupCursor.getInt(groupCursor.getColumnIndex(Groups.SUMMARY_COUNT)));
 				}
-			} while (groupcursor.moveToNext());
-			groupcursor.close();
+			} while (groupCursor.moveToNext());
+			groupCursor.close();
 
-			Collections.sort(_grouplist, Collections.reverseOrder());
+			Collections.sort(groupList, Collections.reverseOrder());
 
 			// Put the requested Group data into the ListView
 			ListView list = (ListView) findViewById(R.id.lstGroups);
@@ -82,45 +82,45 @@ public class GroupList extends Activity {
 	}
 
 	private class GroupInfo implements Comparable<GroupInfo> {
-		private String _name;
-		private int _membercnt;
-		private int _id;
+		private String name;
+		private int memberCnt;
+		private int id;
 
 		public String getName() {
-			return _name;
+			return name;
 		}
 
 		public void setName(String name) {
-			_name = name;
+			this.name = name;
 		}
 
 		public int getMemberCnt() {
-			return _membercnt;
+			return memberCnt;
 		}
 
 		public void setMemberCnt(int cnt) {
-			_membercnt = cnt;
+			memberCnt = cnt;
 		}
 
 		public void addMembers(int newMembers) {
-			_membercnt += newMembers;
+			memberCnt += newMembers;
 		}
 
 		public int getID() {
-			return _id;
+			return id;
 		}
 
 		public void setID(int id) {
-			_id = id;
+			this.id = id;
 		}
 
 		@Override
 		public String toString() {
-			return _name;
+			return name;
 		}
 
 		public int compareTo(GroupInfo other) {
-			return other._name.compareTo(this._name);
+			return other.name.compareTo(this.name);
 		}
 	}
 
@@ -135,7 +135,7 @@ public class GroupList extends Activity {
 		}
 
 		public int getCount() {
-			return context._grouplist.size();
+			return context.groupList.size();
 		}
 
 		public Object getItem(int arg0) {
@@ -147,19 +147,19 @@ public class GroupList extends Activity {
 		}
 
 		public View getView(int position, View convertView, ViewGroup parent) {
-			int entrytoinflate = R.layout.grouplistentry;
+			int entryToInflate = R.layout.grouplistentry;
 
 			View v;
 			if (convertView == null) // if it's not recycled, initialize some attributes
 			{
 				LayoutInflater li = context.getLayoutInflater();
-				v = li.inflate(entrytoinflate, null);
+				v = li.inflate(entryToInflate, null);
 			}
 			else {
 				v = convertView;
 			}
 
-			final GroupInfo group = context._grouplist.get(position);
+			final GroupInfo group = context.groupList.get(position);
 			TextView tv = (TextView) v.findViewById(R.id.txtGroupName);
 			tv.setText(group.getName());
 

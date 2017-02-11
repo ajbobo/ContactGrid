@@ -48,13 +48,13 @@ public class ContactGrid extends Activity {
 	private static final int PERMISSION_READ_CONTACTS_REQUEST = 1;
 
 	// Class variables
-	private long[] _savedKeys;
-	private boolean _showmessages;
-	private boolean _actionshortcuts;
-	private int _numrows;
-	private int _numcols;
-	private int _numentries;
-	private boolean _readContactsAllowed;
+	private long[] savedKeys;
+	private boolean showMessages;
+	private boolean useActionShortcuts;
+	private int numRows;
+	private int numCols;
+	private int numEntries;
+	private boolean readContactsAllowed;
 
 	/**
 	 * Called when the activity is first created.
@@ -69,27 +69,27 @@ public class ContactGrid extends Activity {
 
 		// Initialize the grid with saved preferences
 		SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
-		for (int x = 0; x < _numentries; x++) {
-			_savedKeys[x] = settings.getLong("SavedID" + x, NO_CONTACT);
+		for (int x = 0; x < numEntries; x++) {
+			savedKeys[x] = settings.getLong("SavedID" + x, NO_CONTACT);
 		}
 
 		// Check to see if the READ_CONTACTS permission has been granted
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) { // Marshmallow or later
 			if (checkSelfPermission(Manifest.permission.READ_CONTACTS) == PackageManager.PERMISSION_GRANTED) {
-				_readContactsAllowed = true;
+				readContactsAllowed = true;
 			}
 			else {
-				_readContactsAllowed = false;
+				readContactsAllowed = false;
 				requestPermissions(new String[] { Manifest.permission.READ_CONTACTS }, PERMISSION_READ_CONTACTS_REQUEST);
 			}
 		}
 		else { // Pre-marshmallow
-			_readContactsAllowed = true;
+			readContactsAllowed = true;
 		}
 
 		// Initialize the grid
 		GridView grid = (GridView) findViewById(R.id.gridview);
-		grid.setNumColumns(_numcols);
+		grid.setNumColumns(numCols);
 		grid.setAdapter(new ContactAdapter(this));
 
 		grid.setOnItemClickListener(new OnItemClickListener() {
@@ -114,8 +114,8 @@ public class ContactGrid extends Activity {
 
 		SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
 		SharedPreferences.Editor editor = settings.edit();
-		for (int x = 0; x < _numentries; x++) {
-			editor.putLong("SavedID" + x, _savedKeys[x]);
+		for (int x = 0; x < numEntries; x++) {
+			editor.putLong("SavedID" + x, savedKeys[x]);
 		}
 		editor.commit();
 	}
@@ -156,19 +156,19 @@ public class ContactGrid extends Activity {
 		super.onActivityResult(reqCode, resultCode, data);
 
 		// The request code has the real code and the index embedded in it
-		int realcode = reqCode / 100;
+		int realCode = reqCode / 100;
 		int index = reqCode % 100;
 
 		GridView grid = (GridView) findViewById(R.id.gridview);
 
-		switch (realcode) {
+		switch (realCode) {
 			case PICK_CONTACT:
 				if (resultCode == Activity.RESULT_OK) {
-					Uri contactdata = data.getData();
-					Cursor c = managedQuery(contactdata, null, null, null, null);
+					Uri contactData = data.getData();
+					Cursor c = managedQuery(contactData, null, null, null, null);
 					if (c.moveToFirst()) {
 						long key = c.getLong(c.getColumnIndexOrThrow(ContactsContract.Contacts._ID));
-						_savedKeys[index] = key;
+						savedKeys[index] = key;
 					}
 				}
 
@@ -177,11 +177,11 @@ public class ContactGrid extends Activity {
 				break;
 			case PICK_GROUP:
 				if (resultCode == Activity.RESULT_OK) {
-					Uri groupdata = data.getData();
-					Cursor c = managedQuery(groupdata, null, null, null, null);
+					Uri groupData = data.getData();
+					Cursor c = managedQuery(groupData, null, null, null, null);
 					if (c.moveToFirst()) {
 						long key = c.getLong(c.getColumnIndexOrThrow(ContactsContract.Groups._ID));
-						_savedKeys[index] = -key - 1; // Group id's are stored as negative numbers
+						savedKeys[index] = -key - 1; // Group id's are stored as negative numbers
 					}
 				}
 				else if (resultCode == Activity.RESULT_CANCELED) {
@@ -195,7 +195,7 @@ public class ContactGrid extends Activity {
 				GetPreferences();
 
 				// Resize the grid
-				grid.setNumColumns(_numcols);
+				grid.setNumColumns(numCols);
 				grid.invalidateViews();
 				break;
 		}
@@ -208,8 +208,8 @@ public class ContactGrid extends Activity {
 	public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantPermissions) {
 		switch (requestCode) {
 			case PERMISSION_READ_CONTACTS_REQUEST: {
-				_readContactsAllowed = (grantPermissions.length > 0 && grantPermissions[0] == PackageManager.PERMISSION_GRANTED);
-				if (_readContactsAllowed) // If the user granted the permission, restart the Activity so that it is refreshed correctly
+				readContactsAllowed = (grantPermissions.length > 0 && grantPermissions[0] == PackageManager.PERMISSION_GRANTED);
+				if (readContactsAllowed) // If the user granted the permission, restart the Activity so that it is refreshed correctly
 					this.recreate();
 			}
 		}
@@ -220,9 +220,9 @@ public class ContactGrid extends Activity {
 	 */
 	@Override
 	protected void onPrepareDialog(int id, Dialog dialog) {
-		int realid = id / 100;
+		int realId = id / 100;
 		int index = id % 100;
-		switch (realid) {
+		switch (realId) {
 			case POPUP_OPTIONS_CONTACT:
 				dialog.setTitle(getGridName(index)); // The title needs to be updated because the person in the grid space may have been changed
 				break;
@@ -234,9 +234,9 @@ public class ContactGrid extends Activity {
 	 */
 	@Override
 	public Dialog onCreateDialog(int id) {
-		int realid = id / 100;
+		int realId = id / 100;
 		final int index = id % 100; // This has to be final so that the internal objects I'm about to declare can see it
-		switch (realid) {
+		switch (realId) {
 			case POPUP_OPTIONS_CONTACT:
 				return new AlertDialog.Builder(this).setTitle(getGridName(index)).setItems(R.array.list_popup_options_contact, new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int which) {
@@ -272,68 +272,67 @@ public class ContactGrid extends Activity {
 	 */
 	private void GetPreferences() {
 		SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
-		_showmessages = settings.getBoolean("preference_messages", true);
-		_actionshortcuts = settings.getBoolean("preference_actionshortcuts", true);
+		showMessages = settings.getBoolean("preference_messages", true);
+		useActionShortcuts = settings.getBoolean("preference_actionshortcuts", true);
 
 		// I'm sure there's a better way to do this - http://stackoverflow.com/questions/3206765/number-preferences-in-preference-activity-in-android
 		String val = settings.getString("preference_numrows", "Four");
 		if (val.equalsIgnoreCase("one"))
-			_numrows = 1;
+			numRows = 1;
 		else if (val.equalsIgnoreCase("two"))
-			_numrows = 2;
+			numRows = 2;
 		else if (val.equalsIgnoreCase("three"))
-			_numrows = 3;
+			numRows = 3;
 		else if (val.equalsIgnoreCase("four"))
-			_numrows = 4;
+			numRows = 4;
 		else if (val.equalsIgnoreCase("five"))
-			_numrows = 5;
+			numRows = 5;
 		else if (val.equalsIgnoreCase("six"))
-			_numrows = 6;
+			numRows = 6;
 		else if (val.equalsIgnoreCase("seven"))
-			_numrows = 7;
+			numRows = 7;
 		else if (val.equalsIgnoreCase("eight"))
-			_numrows = 8;
+			numRows = 8;
 		else if (val.equalsIgnoreCase("nine"))
-			_numrows = 9;
+			numRows = 9;
 		else if (val.equalsIgnoreCase("ten"))
-			_numrows = 10;
+			numRows = 10;
 
 		val = settings.getString("preference_numcols", "Three");
 		if (val.equalsIgnoreCase("one"))
-			_numcols = 1;
+			numCols = 1;
 		else if (val.equalsIgnoreCase("two"))
-			_numcols = 2;
+			numCols = 2;
 		else if (val.equalsIgnoreCase("three"))
-			_numcols = 3;
+			numCols = 3;
 		else if (val.equalsIgnoreCase("four"))
-			_numcols = 4;
+			numCols = 4;
 		else if (val.equalsIgnoreCase("five"))
-			_numcols = 5;
+			numCols = 5;
 		else if (val.equalsIgnoreCase("six"))
-			_numcols = 6;
+			numCols = 6;
 		else if (val.equalsIgnoreCase("seven"))
-			_numcols = 7;
+			numCols = 7;
 		else if (val.equalsIgnoreCase("eight"))
-			_numcols = 8;
+			numCols = 8;
 		else if (val.equalsIgnoreCase("nine"))
-			_numcols = 9;
+			numCols = 9;
 		else if (val.equalsIgnoreCase("ten"))
-			_numcols = 10;
+			numCols = 10;
 
-		_numentries = _numrows * _numcols;
+		numEntries = numRows * numCols;
 
 		// Recreate the saved keys array
-		long temp[] = new long[_numentries];
+		long temp[] = new long[numEntries];
 		int keycnt = 0;
-		if (_savedKeys != null) {
-			keycnt = _savedKeys.length;
-			for (int x = 0; x < Math.min(keycnt, temp.length); x++)
-				temp[x] = _savedKeys[x];
+		if (savedKeys != null) {
+			keycnt = savedKeys.length;
+			System.arraycopy(savedKeys, 0, temp, 0, Math.min(keycnt, temp.length));
 		}
 		for (int x = keycnt; x < temp.length; x++)
 			// Fill the new spaces in the array with NO_CONTACT
 			temp[x] = NO_CONTACT;
-		_savedKeys = temp;
+		savedKeys = temp;
 	}
 
 	/**
@@ -360,7 +359,7 @@ public class ContactGrid extends Activity {
 		// Figure out what to do with the selected item
 		if (action == ACTION_SELECT) {
 			if (hasContact(index)) {
-				if (_savedKeys[index] >= 0) {
+				if (savedKeys[index] >= 0) {
 					Uri lookupuri = getGridURI(index);
 					Intent intent = new Intent(Intent.ACTION_VIEW, lookupuri);
 					intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS | Intent.FLAG_ACTIVITY_NO_HISTORY);
@@ -373,14 +372,14 @@ public class ContactGrid extends Activity {
 					startActivity(intent);
 				}
 			}
-			else if (_showmessages) {
+			else if (showMessages) {
 				showToast("You must add a contact to that space first");
 			}
 		}
 		else if (action == ACTION_ADD) {
 			if (!hasContact(index)) {
 				// Opens a Contact list so that the user can select a Contact to add to the Grid
-				if (_readContactsAllowed) {
+				if (readContactsAllowed) {
 					Intent intent = new Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI);
 					startActivityForResult(intent, PICK_CONTACT * 100 + index); // Merge the request code and the index into a single value
 				}
@@ -388,13 +387,13 @@ public class ContactGrid extends Activity {
 					showToast("You have not granted permission to access your Contacts");
 				}
 			}
-			else if (_showmessages) {
+			else if (showMessages) {
 				showToast("That space is already taken");
 			}
 		}
 		else if (action == ACTION_ADD_GROUP) {
 			if (!hasContact(index)) {
-				if (_readContactsAllowed) {
+				if (readContactsAllowed) {
 					// Opens a list of Groups (there isn't a standard one, so I had to write a custom one)
 					Intent intent = new Intent();
 					intent.setClass(this, GroupList.class);
@@ -404,12 +403,12 @@ public class ContactGrid extends Activity {
 					showToast("You have not granted permission to access your Contacts");
 				}
 			}
-			else if (_showmessages) {
+			else if (showMessages) {
 				showToast("That space is already taken");
 			}
 		}
 		else if (action == ACTION_REMOVE) {
-			_savedKeys[index] = NO_CONTACT;
+			savedKeys[index] = NO_CONTACT;
 		}
 
 		// Refresh the grid
@@ -442,12 +441,9 @@ public class ContactGrid extends Activity {
 	 * Return whether or not there's an entry in a grid space
 	 */
 	public boolean hasContact(int index) {
-		long id = _savedKeys[index];
+		long id = savedKeys[index];
 
-		if (id == NO_CONTACT)
-			return false;
-
-		return true;
+		return id != NO_CONTACT;
 	}
 
 	/**
@@ -457,12 +453,12 @@ public class ContactGrid extends Activity {
 		if (!hasContact(index))
 			return null;
 
-		if (!_readContactsAllowed)
+		if (!readContactsAllowed)
 			return null;
 
 		Uri griduri;
-		if (_savedKeys[index] >= 0)
-			griduri = ContentUris.withAppendedId(ContactsContract.Contacts.CONTENT_URI, _savedKeys[index]);
+		if (savedKeys[index] >= 0)
+			griduri = ContentUris.withAppendedId(ContactsContract.Contacts.CONTENT_URI, savedKeys[index]);
 		else
 			griduri = ContentUris.withAppendedId(ContactsContract.Groups.CONTENT_URI, getGroupID(index));
 		return griduri;
@@ -472,11 +468,11 @@ public class ContactGrid extends Activity {
 	 * Returns the photo assigned to the specified grid space
 	 */
 	public Bitmap getGridPhoto(int index) {
-		Uri contacturi = getGridURI(index);
-		if (contacturi == null || _savedKeys[index] < 0)
+		Uri contactUri = getGridURI(index);
+		if (contactUri == null || savedKeys[index] < 0)
 			return null;
 
-		InputStream stream = ContactsContract.Contacts.openContactPhotoInputStream(getContentResolver(), contacturi);
+		InputStream stream = ContactsContract.Contacts.openContactPhotoInputStream(getContentResolver(), contactUri);
 		if (stream == null)
 			return null;
 
@@ -487,19 +483,18 @@ public class ContactGrid extends Activity {
 	 * Returns the name assigned to the specified grid space
 	 */
 	public String getGridName(int index) {
-		Uri contacturi = getGridURI(index);
-		if (contacturi == null)
+		Uri contactUri = getGridURI(index);
+		if (contactUri == null)
 			return "<unknown>";
 
-		Cursor c = managedQuery(contacturi, null, null, null, null);
+		Cursor c = managedQuery(contactUri, null, null, null, null);
 		if (c.moveToFirst()) {
 			String column;
-			if (_savedKeys[index] >= 0)
+			if (savedKeys[index] >= 0)
 				column = ContactsContract.Contacts.DISPLAY_NAME;
 			else
 				column = ContactsContract.Groups.TITLE;
-			String name = c.getString(c.getColumnIndexOrThrow(column));
-			return name;
+			return c.getString(c.getColumnIndexOrThrow(column));
 		}
 
 		return "<null>";
@@ -510,37 +505,34 @@ public class ContactGrid extends Activity {
 	 */
 	private long getGroupID(int index) {
 		// ID 1 is saved as -2, 2 is -3, etc. (so NO_CONTACT still works)
-		return -1 * (_savedKeys[index] + 1);
+		return -1 * (savedKeys[index] + 1);
 	}
 
 	/**
 	 * Returns the number of entries in the grid
 	 */
 	public int getNumEntries() {
-		return _numentries;
+		return numEntries;
 	}
 
 	/**
 	 * Returns the number of columns in the grid
 	 */
 	public int getNumColumns() {
-		return _numcols;
+		return numCols;
 	}
 
 	/**
 	 * Returns whether or not Action Shortcuts should be used
 	 */
 	public boolean getUseActionShortcuts() {
-		return _actionshortcuts;
+		return useActionShortcuts;
 	}
 
 	/**
 	 * Return whether or not the index is a contact (not a group)
 	 */
 	public boolean isIndexAContact(int index) {
-		if (_savedKeys[index] < 0)
-			return false;
-
-		return true;
+		return savedKeys[index] >= 0;
 	}
 }
