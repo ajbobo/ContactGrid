@@ -14,4 +14,9 @@
     <string name="btnSelectAll">Select All</string>
     <string name="menu_contacts">Contacts</string>
     <string name="menu_preferences">Preferences</string>
+    <string name="menu_about">About</string>
+    <string name="lblAbout">About Contact Grid</string>
+    <string name="lblAboutText">Contact Grid was developed by Tri-Nova Software. If you have questions or comments, please email us as <a href="emailto:trinovasoftware@gmail.com">trinovasoftware@gmail.com</a></string>
+    <string name="lblPrivacyPolicy">Privacy Policy</string>
+    <string name="lblPrivacyPolicyText">No data is ever sent from your device to any other services, sites or databases. Your data is yours and is not copied anywhere.</string>
 </resources>

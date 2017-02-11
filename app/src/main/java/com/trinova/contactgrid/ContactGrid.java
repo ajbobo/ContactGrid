@@ -143,6 +143,9 @@ public class ContactGrid extends Activity {
 			case R.id.menu_contacts:
 				LaunchContacts();
 				return true;
+			case R.id.menu_about:
+				LaunchAbout();
+				return true;
 		}
 
 		return super.onOptionsItemSelected(item);
@@ -350,6 +353,20 @@ public class ContactGrid extends Activity {
 	private void LaunchContacts() {
 		Intent intent = new Intent(Intent.ACTION_DEFAULT, ContactsContract.Contacts.CONTENT_URI);
 		startActivity(intent);
+	}
+
+	/**
+	 * Launch the About view
+	 */
+	private void LaunchAbout() {
+		View messageView = getLayoutInflater().inflate(R.layout.about, null, false);
+
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setIcon(R.drawable.ic_launcher_main);
+		builder.setTitle(R.string.app_name);
+		builder.setView(messageView);
+		builder.create();
+		builder.show();
 	}
 
 	/**

@@ -9,7 +9,11 @@
     <item
         android:id="@+id/menu_preferences"
         android:title="@string/menu_preferences"
-        android:showAsAction="ifRoom"
         android:titleCondensed="@string/menu_preferences"
-        android:icon="@drawable/menu_preferences" />
+        android:icon="@drawable/menu_preferences"
+        android:showAsAction="ifRoom" />
+    <item android:title="@string/menu_about"
+        android:icon="@android:drawable/ic_menu_help"
+        android:showAsAction="never"
+        android:id="@+id/menu_about" />
 </menu>
