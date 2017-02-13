@@ -3,6 +3,9 @@ Add Wear support - How do I do this and keep support for earlier versions of And
 Hide/disable "Use Action Shortcuts" for Android version 6+ (or 5+?)
 Change dialogs from deprecated code to DialogFragment
 Change Preferences from deprecated code
+Can the code in the ContactGrid Activity be simplified or better organized?
+	Move functions like getGridUri(), getGridPhoto(), etc to a helper class that manages the Grid data?
+Replace managedQuery() calls with non-deprecated API call?
 
 -- Completed items --
 Crash when trying to add a Group if there aren't any defined. - Fixed - Released 1/2/2015
